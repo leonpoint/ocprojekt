@@ -3,11 +3,15 @@ breed [blocks block]
 breed [flags flag]
 breed [hurdles hurdle]
 
+; the round has ended (by death or reaching the flag]
+globals[game-over]
+
 hurdles-own [xcord ycord]
 
 to setup
   clear-all
   reset-ticks
+  set game-over false
 
 
   ask patches [
@@ -80,8 +84,9 @@ to setup
     set color red
     set size 6
   ]
+  ;-- Player starts on x=0, y=0
   ask players [
-    set xcor 5
+    set xcor 0
     set ycor 0
     set size 2
     set heading 90
@@ -93,21 +98,19 @@ end
 
 
 to go
-  let finish 0
-
   ask players [
-
-    ifelse xcor < 65 [
+    ifelse xcor < 65 and not game-over [
+      if  game-over [ stop ]
       forward 1
       if count hurdles-here > 0 [
-        set finish 1
+        set game-over true
       ]
     ]
     [
-      set finish 1
+      set game-over true
     ]
     ]
-  if  finish = 1 [ stop ]
+  if  game-over [ stop ]
 
   tick
 end
@@ -115,7 +118,7 @@ end
 
 to jump-regular
   let counter 0
-  while [counter < 4] [
+  while [counter < 4 and not game-over ] [
   ask players [
     set ycor 3
     forward 1
@@ -125,12 +128,15 @@ to jump-regular
   ]
   ask players [
     set ycor 0
+    if count hurdles-here > 0 [
+      set game-over true
+    ]
   ]
 end
 
 to jump-long
   let counter 0
-  while [counter < 6] [
+  while [counter < 6 and not game-over] [
   ask players [
     set ycor 3
     forward 1
@@ -140,8 +146,30 @@ to jump-long
   ]
   ask players [
     set ycor 0
+    if count hurdles-here > 0 [
+      set game-over true
+    ]
   ]
 end
+; jump 4 units wide, 4 units up
+to jump-high
+  let counter 0
+  while [counter < 4 and not game-over] [
+  ask players [
+    set ycor 4
+    forward 1
+  ]
+  set counter counter + 1
+  tick
+  ]
+  ask players [
+    set ycor 0
+    if count hurdles-here > 0 [
+      set game-over true
+    ]
+  ]
+end
+
 @#$#@#$#@
 GRAPHICS-WINDOW
 210
@@ -171,28 +199,28 @@ ticks
 60.0
 
 BUTTON
-45
-50
-108
-83
-NIL
+206
+372
+291
+405
+Restart
 setup
 NIL
 1
 T
 OBSERVER
 NIL
-NIL
+R
 NIL
 NIL
 1
 
 BUTTON
-124
-50
-187
-83
-NIL
+307
+372
+383
+405
+Start
 go
 T
 1
@@ -202,13 +230,13 @@ NIL
 NIL
 NIL
 NIL
-1
+0
 
 BUTTON
-105
-257
-168
-290
+469
+336
+561
+369
 Jump
 jump-regular
 NIL
@@ -219,13 +247,13 @@ NIL
 S
 NIL
 NIL
-1
+0
 
 BUTTON
-7
-256
-99
-289
+566
+336
+658
+369
 Long Jump
 jump-long
 NIL
@@ -237,6 +265,33 @@ D
 NIL
 NIL
 1
+
+BUTTON
+512
+298
+604
+331
+High Jump
+jump-high
+NIL
+1
+T
+OBSERVER
+NIL
+W
+NIL
+NIL
+0
+
+TEXTBOX
+210
+295
+397
+370
+Press [R] to Restart the Round\nPress [Space] to Start the Game\nPress the labeled keys for a Jump\n
+12
+0.0
+0
 
 @#$#@#$#@
 ## WHAT IS IT?
