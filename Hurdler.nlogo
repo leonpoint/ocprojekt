@@ -6,7 +6,6 @@ breed [hurdles hurdle]
 ; the round has ended (by death or reaching the flag]
 globals[game-over]
 
-hurdles-own [xcord ycord]
 
 to setup
   clear-all
@@ -20,7 +19,7 @@ to setup
     set pcolor green
 
   ]
-  create-hurdles 6
+  create-hurdles 9
   create-players 1
   create-flags 1
 
@@ -32,52 +31,52 @@ to setup
 
   ask hurdle 0 [
     set xcor 20
-    set xcord 20
     set ycor 0
-    set ycord 0
     set size 1
     set color brown
   ]
   ask hurdle 1 [
     set xcor 20
-    set xcord 20
     set ycor 1
-    set ycord 1
-    set size 1
     set color brown
   ]
   ask hurdle 2 [
     set xcor 30
-    set xcord 20
     set ycor 0
-    set ycord 0
-    set size 1
     set color brown
   ]
   ask hurdle 3 [
     set xcor 31
-    set xcord 20
     set ycor 0
-    set ycord 0
-    set size 1
     set color brown
   ]
   ask hurdle 4 [
     set xcor 32
-    set xcord 20
     set ycor 0
-    set ycord 0
-    set size 1
     set color brown
   ]
   ask hurdle 5 [
     set xcor 33
-    set xcord 20
     set ycor 0
-    set ycord 0
-    set size 1
     set color brown
   ]
+  ask hurdle 6 [
+    set xcor 45
+    set ycor 0
+    set color brown
+  ]
+  ask hurdle 7 [
+    set xcor 45
+    set ycor 1
+    set color brown
+  ]
+  ask hurdle 8 [
+    set xcor 45
+    set ycor 2
+    set color brown
+  ]
+
+
   ask flags [
     set xcor 65
     set ycor 3
@@ -101,7 +100,7 @@ to go
   ask players [
     ifelse xcor < 65 and not game-over [
       if  game-over [ stop ]
-      forward 1
+      fd 0.25
       if count hurdles-here > 0 [
         set game-over true
       ]
@@ -118,10 +117,13 @@ end
 
 to jump-regular
   let counter 0
-  while [counter < 4 and not game-over ] [
+  while [counter < 16 and not game-over ] [
   ask players [
     set ycor 3
-    forward 1
+    forward 0.25
+    if count hurdles-here > 0 [
+      set game-over true
+    ]
   ]
   set counter counter + 1
   tick
@@ -136,10 +138,13 @@ end
 
 to jump-long
   let counter 0
-  while [counter < 6 and not game-over] [
+  while [counter < 24 and not game-over] [
   ask players [
     set ycor 3
-    forward 1
+    forward 0.25
+    if count hurdles-here > 0 [
+      set game-over true
+    ]
   ]
   set counter counter + 1
   tick
@@ -154,10 +159,13 @@ end
 ; jump 4 units wide, 4 units up
 to jump-high
   let counter 0
-  while [counter < 4 and not game-over] [
+  while [counter < 16 and not game-over] [
   ask players [
     set ycor 4
-    forward 1
+    forward 0.25
+    if count hurdles-here > 0 [
+      set game-over true
+    ]
   ]
   set counter counter + 1
   tick
