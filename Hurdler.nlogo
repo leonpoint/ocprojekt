@@ -73,7 +73,7 @@ to setup-flag
   set-default-shape flags "flag"
 
   ask flags [
-    set xcor 65
+    set xcor 67
     set ycor 3
     set color red
     set size 6
@@ -361,8 +361,8 @@ to setup-Relation-Matrix
   while [g < 65] [
     set f 0
     while [f < 4] [
-      if matrix:get Relation-Matrix g f > 65 [
-        matrix:set Relation-Matrix g f 65
+      if matrix:get Relation-Matrix g f > 64 [
+        matrix:set Relation-Matrix g f 64
       ]
       set f f + 1
     ]
@@ -373,26 +373,70 @@ to setup-Relation-Matrix
 end
 
 
-
+; for hurdles, anything that lands in it is -1
+; for boxes, check where the jump was made (for every jump), and set the matrix where it lands to -1
 
 
 to setup-Reward-Matrix
   set Reward-Matrix matrix:make-constant 65 4 0
   let i 0
 
-  ;-- walk
+
+  ;hurdle 1
+  matrix:set-row Reward-Matrix 19 [-1 -1 -1 -1]
+
+  ;box 1
+  matrix:set Reward-Matrix 19 2 -1
+  matrix:set Reward-Matrix 20 2 -1
+  matrix:set Reward-Matrix 21 2 -1
+  matrix:set Reward-Matrix 22 2 -1
+  matrix:set Reward-Matrix 23 2 -1
+
+  ;hurdle 2
+  matrix:set-row Reward-Matrix 29 [-1 -1 -1 -1]
+  matrix:set-row Reward-Matrix 30 [-1 -1 -1 -1]
+  matrix:set-row Reward-Matrix 31 [-1 -1 -1 -1]
+  matrix:set-row Reward-Matrix 32 [-1 -1 -1 -1]
+
+  ;hurdle 3
+  matrix:set-row Reward-Matrix 44 [-1 -1 -1 -1]
+  matrix:set-row Reward-Matrix 45 [0 -1 0 -1] ;-1 because long jump dies from box 2
+  matrix:set-row Reward-Matrix 46 [0 -1 0 -1]
+  matrix:set-row Reward-Matrix 47 [0 -1 0 -1]
+  matrix:set-row Reward-Matrix 48 [0 0 0 -1]
+  matrix:set-row Reward-Matrix 49 [0 0 0 -1]
+  ;box 2
+  matrix:set-row Reward-Matrix 37 [0 -1 -1 0]
+  matrix:set-row Reward-Matrix 38 [0 -1 -1 0]
+  matrix:set-row Reward-Matrix 39 [0 -1 -1 -1]
+  matrix:set-row Reward-Matrix 40 [0 -1 -1 -1]
+  matrix:set-row Reward-Matrix 41 [0 -1 -1 -1]
+  matrix:set-row Reward-Matrix 42 [0 -1 -1 -1]
+  matrix:set-row Reward-Matrix 43 [0 -1 -1 -1]
+  matrix:set-row Reward-Matrix 44 [0 0 0 -1]
+  matrix:set-row Reward-Matrix 45 [0 0 0 -1]
 
 
-
-  ;-- regular
-
-  ;-- long
-
-  ;-- high
-
+  matrix:set-row Reward-Matrix 64 [100 100 100 100]
 
   print matrix:pretty-print-text Reward-Matrix
 end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 @#$#@#$#@
 GRAPHICS-WINDOW
 210
