@@ -24,7 +24,7 @@ to setup
   ;--- Q Matrix with height 65, Width 4
   set Q-Matrix matrix:make-constant 65 4 0
 
-  set Iterations 1000
+  set Iterations 10000
 
   set Q_Size 65
 
@@ -91,40 +91,11 @@ to episode
   print "episode done"
 end
 
-; Überprüfen auf Fehler !!!!!!!!!!!!!!!!!!!!!!
+
 to chooseAction
-  let maxQ -1
-  set action -1
-  let i 0
 
-  ; Aktionsauswahl im Fall Q-Matrix Reihe nur 0
-  if reduce + (matrix:get-row Q-Matrix currentState) = 0 [
-    set action random Action_Size
-  ]
+  set action random Action_Size
 
-  ; Aktionsauswahl falls max der Q-Matrix Reihe = 0
-  if reduce + (matrix:get-row Q-Matrix currentState) < 0 [
-    let found false
-    while [not found] [
-      let index random Action_Size
-      if (matrix:get Q-Matrix currentState index) >= 0 [
-        set action index
-        set found true
-      ]
-    ]
-  ]
-
-  ; Aktion mit max Q wird ausgewählt
-  if reduce + (matrix:get-row Q-Matrix currentState) > 0 [
-    while [ i < Action_Size ] [
-      let temp matrix:get Q-Matrix currentState i
-      if temp > maxQ [
-        set maxQ temp
-        set action i
-      ]
-      set i i + 1
-    ]
-  ]
 end
 
 
@@ -138,7 +109,7 @@ to calculate-q
 
   calculate-max
 
-  let calculatedReward (matrix:get Q-Matrix currentState action) + learningRate * (nextReward + discountFactor * calculatedMax - (matrix:get Q-Matrix currentState action))
+  let calculatedReward (matrix:get Q-Matrix currentState action) + learningRate * ((nextReward + discountFactor * calculatedMax) - (matrix:get Q-Matrix currentState action))
   matrix:set Q-Matrix currentState action calculatedReward
 
   set currentState nextState
