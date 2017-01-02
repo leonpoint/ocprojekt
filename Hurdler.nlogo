@@ -21,7 +21,7 @@ to setup
   ;--- Q Matrix with height 65, Width 4
   set Q-Matrix matrix:make-constant 65 4 0
 
-  set Iterations 10
+  set Iterations 100
 
   set Q_Size 65
 
@@ -49,13 +49,11 @@ end
 to train
   let iter 0
   while [iter < Iterations] [
-
     episode
-
-
     set iter iter + 1
   ]
 
+  print matrix:pretty-print-text Q-Matrix
 
 end
 
@@ -63,8 +61,19 @@ end
 to episode
   while [not game-over] [
     chooseAction
-
   ]
+
+  ask players [
+    set xcor 0
+  ]
+  reset-ticks
+
+  set game-over false
+
+  set currentState 0
+  set nextState 0
+
+  print "episode done"
 
 
 end
@@ -77,7 +86,13 @@ to chooseAction
 
   calculate-max
 
-  let calculatedReward (matrix:get Q-Matrix currentState action) - learningRate * (nextReward + discountFactor * calculatedMax - (matrix:get Q-Matrix currentState action))
+  let calculatedReward (matrix:get Q-Matrix currentState action) + learningRate * (nextReward + discountFactor * calculatedMax - (matrix:get Q-Matrix currentState action))
+  matrix:set Q-Matrix currentState action calculatedReward
+  set currentState nextState
+  if currentState > 63 [
+    set game-over true
+  ]
+
 end
 
 to calculate-max
@@ -338,7 +353,13 @@ to fall-down
   ]
 end
 
+to walk
+  let counter 0
+  while [counter < 4] [
+    move-forward
+  ]
 
+end
 to jump-regular
   let counter 0
   while [counter < 16 and not game-over ] [
@@ -427,7 +448,7 @@ to setup-Relation-Matrix
     set g g + 1
   ]
 
-  print matrix:pretty-print-text Relation-Matrix
+  ;print matrix:pretty-print-text Relation-Matrix
 end
 
 
@@ -477,7 +498,7 @@ to setup-Reward-Matrix
 
   matrix:set-row Reward-Matrix 64 [100 100 100 100]
 
-  print matrix:pretty-print-text Reward-Matrix
+  ;print matrix:pretty-print-text Reward-Matrix
 end
 
 
