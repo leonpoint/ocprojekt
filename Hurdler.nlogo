@@ -177,69 +177,66 @@ to move-player
   tick
 end
 
+to move-forward
+  ask players [
+    if xcor < 65 and not game-over [
+      forward 0.25
+      if count hurdles-here > 0 [
+        set game-over true
+      ]
+    ]
+  ]
+
+end
+
+to fall-down
+  ask players [
+    set ycor 0
+      if count hurdles-here > 0 [
+        set game-over true
+      ]
+  ]
+end
+
 
 to jump-regular
   let counter 0
   while [counter < 16 and not game-over ] [
-  ask players [
-    set ycor 3
-    forward 0.25
-    if count hurdles-here > 0 [
-      set game-over true
+    ask players [
+      set ycor 3
+      move-forward
     ]
+    set counter counter + 1
+    tick
   ]
-  set counter counter + 1
-  tick
-  ]
-  ask players [
-    set ycor 0
-    if count hurdles-here > 0 [
-      set game-over true
-    ]
-  ]
+  fall-down
 end
 
 to jump-long
   let counter 0
   while [counter < 24 and not game-over] [
-  ask players [
-    set ycor 3
-    forward 0.25
-    if count hurdles-here > 0 [
-      set game-over true
+    ask players [
+      set ycor 3
+      move-forward
     ]
+    set counter counter + 1
+    tick
   ]
-  set counter counter + 1
-  tick
-  ]
-  ask players [
-    set ycor 0
-    if count hurdles-here > 0 [
-      set game-over true
-    ]
-  ]
+  fall-down
 end
 
 ; jump 4 units wide, 4 units up
 to jump-high
   let counter 0
   while [counter < 16 and not game-over] [
-  ask players [
-    set ycor 4
-    forward 0.25
-    if count hurdles-here > 0 [
-      set game-over true
+    ask players [
+      set ycor 4
+      move-forward
     ]
+    set counter counter + 1
+    tick
   ]
-  set counter counter + 1
-  tick
-  ]
-  ask players [
-    set ycor 0
-    if count hurdles-here > 0 [
-      set game-over true
-    ]
-  ]
+  fall-down
 end
 
 
