@@ -12,20 +12,59 @@ to setup
   reset-ticks
   set game-over false
 
+  setup-patches
+  setup-hurdles
+  setup-player
+  setup-flag
+
+end
+
+to setup-patches
 
   ask patches [
     set pcolor grey]
   ask patches with [pycor = -1] [
     set pcolor green
-
   ]
-  create-hurdles 9
+
+end
+
+
+to setup-player
+
   create-players 1
-  create-flags 1
 
   set-default-shape players "person"
 
+  ;-- Player starts on x=0, y=0
+  ask players [
+    set xcor 0
+    set ycor 0
+    set size 2
+    set heading 90
+    set color black
+
+  ]
+end
+
+to setup-flag
+
+  create-flags 1
+
   set-default-shape flags "flag"
+
+  ask flags [
+    set xcor 65
+    set ycor 3
+    set color red
+    set size 6
+  ]
+end
+
+
+to setup-hurdles
+
+  create-hurdles 10
 
   set-default-shape hurdles "square"
 
@@ -75,32 +114,24 @@ to setup
     set ycor 2
     set color brown
   ]
-
-
-  ask flags [
-    set xcor 65
+  ask hurdle 9 [
+    set xcor 45
     set ycor 3
-    set color red
-    set size 6
-  ]
-  ;-- Player starts on x=0, y=0
-  ask players [
-    set xcor 0
-    set ycor 0
-    set size 2
-    set heading 90
-    set color black
-
+    set color brown
   ]
 
 end
 
-
 to go
+  move-player
+end
+
+
+to move-player
   ask players [
     ifelse xcor < 65 and not game-over [
       if  game-over [ stop ]
-      fd 0.25
+      forward 0.25
       if count hurdles-here > 0 [
         set game-over true
       ]
@@ -156,6 +187,7 @@ to jump-long
     ]
   ]
 end
+
 ; jump 4 units wide, 4 units up
 to jump-high
   let counter 0
@@ -177,6 +209,7 @@ to jump-high
     ]
   ]
 end
+
 
 @#$#@#$#@
 GRAPHICS-WINDOW
