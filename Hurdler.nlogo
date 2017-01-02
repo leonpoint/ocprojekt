@@ -7,11 +7,14 @@ breed [hurdles hurdle]
 breed [coins coin]
 
 ; the round has ended (by death or reaching the flag]
-globals[game-over Q-Matrix Relation-Matrix Iterations Reward-Matrix Q_Size currentState nextState nextReward calculatedMax Action_Size]
+globals[game-over Q-Matrix Relation-Matrix Iterations Reward-Matrix Q_Size currentState nextState nextReward calculatedMax Action_Size action]
 
 ; Actions
 ; walk, regular, high, long
 ;   0      1      2      3
+
+; Läuft noch weiter obwohl hintere Hürde berührt wird !!!!!!
+; Lernt, Infos gehen aber nicht bis zum Anfang der Q-Matrix !!!!!!!!
 
 to setup
   clear-all
@@ -72,6 +75,7 @@ end
 to episode
   while [not game-over] [
     chooseAction
+    calculate-q
   ]
 
   ask players [
@@ -87,11 +91,47 @@ to episode
   print "episode done"
 end
 
-
+; Überprüfen auf Fehler !!!!!!!!!!!!!!!!!!!!!!
 to chooseAction
-  let action random 4
+  let maxQ -1
+  set action -1
+  let i 0
+
+  ; Aktionsauswahl im Fall Q-Matrix Reihe nur 0
+  if reduce + (matrix:get-row Q-Matrix currentState) = 0 [
+    set action random Action_Size
+  ]
+
+  ; Aktionsauswahl falls max der Q-Matrix Reihe = 0
+  if reduce + (matrix:get-row Q-Matrix currentState) < 0 [
+    let found false
+    while [not found] [
+      let index random Action_Size
+      if (matrix:get Q-Matrix currentState index) >= 0 [
+        set action index
+        set found true
+      ]
+    ]
+  ]
+
+  ; Aktion mit max Q wird ausgewählt
+  if reduce + (matrix:get-row Q-Matrix currentState) > 0 [
+    while [ i < Action_Size ] [
+      let temp matrix:get Q-Matrix currentState i
+      if temp > maxQ [
+        set maxQ temp
+        set action i
+      ]
+      set i i + 1
+    ]
+  ]
+end
+
+
+to calculate-q
   set nextState matrix:get Relation-Matrix currentState action
   set nextReward matrix:get Reward-Matrix nextState action
+
   if nextReward = -1 [
     set game-over true
   ]
@@ -101,9 +141,10 @@ to chooseAction
   let calculatedReward (matrix:get Q-Matrix currentState action) + learningRate * (nextReward + discountFactor * calculatedMax - (matrix:get Q-Matrix currentState action))
   matrix:set Q-Matrix currentState action calculatedReward
 
-
-  ask players [set xcor currentState]
   set currentState nextState
+
+  ; Matrix um 1 verschoben!!!
+  ask players [set xcor (currentState + 1)]
 
   if currentState > 63 [
     set game-over true
@@ -677,7 +718,7 @@ learningRate
 learningRate
 0.01
 1
-0.64
+0.5
 0.01
 1
 NIL
@@ -692,7 +733,7 @@ discountFactor
 discountFactor
 0
 1
-0.61
+0.75
 0.01
 1
 NIL
