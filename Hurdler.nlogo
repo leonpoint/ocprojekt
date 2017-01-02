@@ -21,7 +21,7 @@ to setup
   ;--- Q Matrix with height 65, Width 4
   set Q-Matrix matrix:make-constant 65 4 0
 
-  set Iterations 100
+  set Iterations 1000
 
   set Q_Size 65
 
@@ -83,12 +83,19 @@ to chooseAction
   let action random 4
   set nextState matrix:get Relation-Matrix currentState action
   set nextReward matrix:get Reward-Matrix nextState action
+  if nextReward = -1 [
+    set game-over true
+  ]
 
   calculate-max
 
   let calculatedReward (matrix:get Q-Matrix currentState action) + learningRate * (nextReward + discountFactor * calculatedMax - (matrix:get Q-Matrix currentState action))
   matrix:set Q-Matrix currentState action calculatedReward
+
+
+  ask players [set xcor currentState]
   set currentState nextState
+
   if currentState > 63 [
     set game-over true
   ]
@@ -538,8 +545,8 @@ GRAPHICS-WINDOW
 70
 -3
 19
-1
-1
+0
+0
 1
 ticks
 60.0
@@ -665,7 +672,7 @@ learningRate
 learningRate
 0.01
 1
-0.5
+0.64
 0.01
 1
 NIL
@@ -680,7 +687,7 @@ discountFactor
 discountFactor
 0
 1
-0.01
+0.61
 0.01
 1
 NIL
