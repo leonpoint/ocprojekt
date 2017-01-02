@@ -42,7 +42,14 @@ to setup
   setup-Reward-Matrix
 
   ask patches with [(pxcor + pycor) mod 2 = 0] [set pcolor 6]
+end
 
+
+to go
+  move-player
+  move-hurdle-one
+  tick
+  if game-over [stop]
 end
 
 
@@ -54,8 +61,12 @@ to train
   ]
 
   print matrix:pretty-print-text Q-Matrix
-
 end
+
+
+
+
+;################################## q-learning-subprocedures ##################################
 
 
 to episode
@@ -74,8 +85,6 @@ to episode
   set nextState 0
 
   print "episode done"
-
-
 end
 
 
@@ -99,8 +108,8 @@ to chooseAction
   if currentState > 63 [
     set game-over true
   ]
-
 end
+
 
 to calculate-max
   set calculatedMax 0
@@ -114,9 +123,13 @@ to calculate-max
      ]
      set i i + 1
    ]
-
-
 end
+
+
+
+
+;################################## setup-subprocedures ##################################
+
 
 to setup-patches
 
@@ -145,6 +158,7 @@ to setup-player
 
   ]
 end
+
 
 to setup-flag
 
@@ -252,6 +266,7 @@ to setup-hurdles
   ]
 end
 
+
 to setup-coins
   create-coins 3
 
@@ -275,139 +290,6 @@ to setup-coins
     set ycor 3
   ]
 
-end
-
-to go
-  move-player
-  move-hurdle-one
-  tick
-  if game-over [stop]
-end
-
-
-to move-hurdle-one
-  if ticks mod 40 = 0 [
-    ask hurdle 0 [
-      set xcor 20
-    ]
-    ask hurdle 1 [
-      set xcor 20
-    ]
-  ]
-  if ticks mod 40 = 5 [
-    ask hurdle 0 [
-      set xcor 21
-    ]
-    ask hurdle 1 [
-      set xcor 21
-    ]
-  ]
-  if ticks mod 40 = 10 [
-    ask hurdle 0 [
-      set xcor 22
-    ]
-    ask hurdle 1 [
-      set xcor 22
-    ]
-  ]
-  if ticks mod 40 = 15 [
-    ask hurdle 0 [
-      set xcor 21
-    ]
-    ask hurdle 1 [
-      set xcor 21
-    ]
-  ]
-
-
-end
-
-to move-player
-  ask players [
-    pen-down
-    ifelse xcor < 65 and not game-over [
-      if  game-over [ stop ]
-      forward 0.25
-      if count hurdles-here > 0 [
-        set game-over true
-      ]
-    ]
-    [
-      set game-over true
-    ]
-    ]
-  if  game-over [ stop ]
-end
-
-to move-forward
-  ask players [
-    if xcor < 65 and not game-over [
-      forward 0.25
-      if count hurdles-here > 0 [
-        set game-over true
-      ]
-    ]
-  ]
-
-end
-
-to fall-down
-  ask players [
-    set ycor 0
-      if count hurdles-here > 0 [
-        set game-over true
-      ]
-  ]
-end
-
-to walk
-  let counter 0
-  while [counter < 4] [
-    move-forward
-  ]
-
-end
-to jump-regular
-  let counter 0
-  while [counter < 16 and not game-over ] [
-    ask players [
-      set ycor 3
-      move-forward
-    ]
-    set counter counter + 1
-    tick
-    move-hurdle-one
-  ]
-  fall-down
-end
-
-to jump-long
-  let counter 0
-  while [counter < 24 and not game-over] [
-    ask players [
-      set ycor 3
-      move-forward
-    ]
-    set counter counter + 1
-    tick
-    move-hurdle-one
-  ]
-  fall-down
-end
-
-; jump 4 units wide, 4 units up
-to jump-high
-  let counter 0
-  while [counter < 16 and not game-over] [
-    ask players [
-      set ycor 4
-      move-forward
-    ]
-    set counter counter + 1
-    tick
-    move-hurdle-one
-  ]
-  fall-down
 end
 
 
@@ -462,7 +344,6 @@ end
 ; for hurdles, anything that lands in it is -1
 ; for boxes, check where the jump was made (for every jump), and set the matrix where it lands to -1
 
-
 to setup-Reward-Matrix
   set Reward-Matrix matrix:make-constant 65 4 0
   let i 0
@@ -511,18 +392,142 @@ end
 
 
 
+;################################## go-subprocedures ##################################
+
+
+to move-hurdle-one
+  if ticks mod 40 = 0 [
+    ask hurdle 0 [
+      set xcor 20
+    ]
+    ask hurdle 1 [
+      set xcor 20
+    ]
+  ]
+  if ticks mod 40 = 5 [
+    ask hurdle 0 [
+      set xcor 21
+    ]
+    ask hurdle 1 [
+      set xcor 21
+    ]
+  ]
+  if ticks mod 40 = 10 [
+    ask hurdle 0 [
+      set xcor 22
+    ]
+    ask hurdle 1 [
+      set xcor 22
+    ]
+  ]
+  if ticks mod 40 = 15 [
+    ask hurdle 0 [
+      set xcor 21
+    ]
+    ask hurdle 1 [
+      set xcor 21
+    ]
+  ]
+end
+
+
+to move-player
+  ask players [
+    pen-down
+    ifelse xcor < 65 and not game-over [
+      if  game-over [ stop ]
+      forward 0.25
+      if count hurdles-here > 0 [
+        set game-over true
+      ]
+    ]
+    [
+      set game-over true
+    ]
+    ]
+  if  game-over [ stop ]
+end
 
 
 
 
+;################################## movement-subprocedures ##################################
 
 
+to walk
+  let counter 0
+  while [counter < 4] [
+    move-forward
+  ]
+end
 
 
+to jump-regular
+  let counter 0
+  while [counter < 16 and not game-over ] [
+    ask players [
+      set ycor 3
+      move-forward
+    ]
+    set counter counter + 1
+    tick
+    move-hurdle-one
+  ]
+  fall-down
+end
 
 
+to jump-long
+  let counter 0
+  while [counter < 24 and not game-over] [
+    ask players [
+      set ycor 3
+      move-forward
+    ]
+    set counter counter + 1
+    tick
+    move-hurdle-one
+  ]
+  fall-down
+end
 
 
+; jump 4 units wide, 4 units up
+to jump-high
+  let counter 0
+  while [counter < 16 and not game-over] [
+    ask players [
+      set ycor 4
+      move-forward
+    ]
+    set counter counter + 1
+    tick
+    move-hurdle-one
+  ]
+  fall-down
+end
+
+
+to move-forward
+  ask players [
+    if xcor < 65 and not game-over [
+      forward 0.25
+      if count hurdles-here > 0 [
+        set game-over true
+      ]
+    ]
+  ]
+end
+
+
+to fall-down
+  ask players [
+    set ycor 0
+      if count hurdles-here > 0 [
+        set game-over true
+      ]
+  ]
+end
 @#$#@#$#@
 GRAPHICS-WINDOW
 210
