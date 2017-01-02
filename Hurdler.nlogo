@@ -2,6 +2,7 @@ breed [players player]
 breed [blocks block]
 breed [flags flag]
 breed [hurdles hurdle]
+breed [coins coin]
 
 ; the round has ended (by death or reaching the flag]
 globals[game-over]
@@ -15,7 +16,13 @@ to setup
   setup-patches
   setup-hurdles
   setup-player
+
+
+
   setup-flag
+
+  setup-coins
+
 
 end
 
@@ -118,6 +125,31 @@ to setup-hurdles
     set xcor 45
     set ycor 3
     set color brown
+  ]
+
+end
+
+to setup-coins
+  create-coins 3
+
+  set-default-shape coins "circle"
+  ask coins [
+    set color yellow
+  ]
+
+  ask coin 12 [
+    set xcor 10
+    set ycor 5
+  ]
+
+  ask coin 13 [
+    set xcor 40
+    set ycor 3
+  ]
+
+  ask coin 14 [
+    set xcor 25
+    set ycor 3
   ]
 
 end
