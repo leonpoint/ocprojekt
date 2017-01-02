@@ -18,6 +18,9 @@ to setup
   reset-ticks
   set game-over false
 
+
+
+
   ;--- Q Matrix with height 65, Width 4
   set Q-Matrix matrix:make-constant 65 4 0
 
@@ -29,6 +32,9 @@ to setup
 
   setup-Relation-Matrix
 
+  setup-Reward-Matrix
+
+  ask patches with [(pxcor + pycor) mod 2 = 0] [set pcolor 6]
 
 end
 
@@ -77,16 +83,18 @@ end
 
 to setup-hurdles
 
-  create-hurdles 10
+  create-hurdles 16
 
   set-default-shape hurdles "square"
 
+  ; this one moves
   ask hurdle 0 [
     set xcor 20
     set ycor 0
     set size 1
     set color brown
   ]
+  ; this one moves (together with hurdle 0)
   ask hurdle 1 [
     set xcor 20
     set ycor 1
@@ -132,7 +140,36 @@ to setup-hurdles
     set ycor 3
     set color brown
   ]
-
+  ask hurdle 10 [
+    set xcor 20
+    set ycor 4
+    set color brown
+  ]
+  ask hurdle 11 [
+    set xcor 38
+    set ycor 2
+    set color brown
+  ]
+  ask hurdle 12 [
+    set xcor 39
+    set ycor 2
+    set color brown
+  ]
+  ask hurdle 13 [
+    set xcor 40
+    set ycor 2
+    set color brown
+  ]
+  ask hurdle 14 [
+    set xcor 38
+    set ycor 3
+    set color brown
+  ]
+  ask hurdle 15 [
+    set xcor 38
+    set ycor 4
+    set color brown
+  ]
 end
 
 to setup-coins
@@ -339,6 +376,23 @@ end
 
 
 
+to setup-Reward-Matrix
+  set Reward-Matrix matrix:make-constant 65 4 0
+  let i 0
+
+  ;-- walk
+
+
+
+  ;-- regular
+
+  ;-- long
+
+  ;-- high
+
+
+  print matrix:pretty-print-text Reward-Matrix
+end
 @#$#@#$#@
 GRAPHICS-WINDOW
 210
