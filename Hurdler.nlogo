@@ -7,7 +7,7 @@ breed [hurdles hurdle]
 breed [coins coin]
 
 ; the round has ended (by death or reaching the flag]
-globals[game-over Q-Matrix Relation-Matrix Gamma Reward-Matrix]
+globals[game-over Q-Matrix Relation-Matrix Iterations Reward-Matrix Q_Size currentState nextState nextReward calculatedMax Action_Size]
 
 ; Actions
 ; walk, regular, high, long
@@ -18,11 +18,18 @@ to setup
   reset-ticks
   set game-over false
 
-
-
-
   ;--- Q Matrix with height 65, Width 4
   set Q-Matrix matrix:make-constant 65 4 0
+
+  set Iterations 10
+
+  set Q_Size 65
+
+  set Action_Size 4
+
+  set currentState 0
+
+  set nextState 0
 
   setup-patches
   setup-hurdles
@@ -35,6 +42,57 @@ to setup
   setup-Reward-Matrix
 
   ask patches with [(pxcor + pycor) mod 2 = 0] [set pcolor 6]
+
+end
+
+
+to train
+  let iter 0
+  while [iter < Iterations] [
+
+    episode
+
+
+    set iter iter + 1
+  ]
+
+
+end
+
+
+to episode
+  while [not game-over] [
+    chooseAction
+
+  ]
+
+
+end
+
+
+to chooseAction
+  let action random 4
+  set nextState matrix:get Relation-Matrix currentState action
+  set nextReward matrix:get Reward-Matrix nextState action
+
+  calculate-max
+
+  let calculatedReward (matrix:get Q-Matrix currentState action) - learningRate * (nextReward + discountFactor * calculatedMax - (matrix:get Q-Matrix currentState action))
+end
+
+to calculate-max
+  set calculatedMax 0
+  let i 0
+
+  ; mit hilfe der übergangsmatrix vom aktuellen State den maximal möglichen Reward finden
+  while [ i < Action_Size ] [
+     let temp matrix:get Q-Matrix (matrix:get Relation-Matrix currentstate i) i
+     if temp > calculatedMax [
+       set calculatedMax temp
+     ]
+     set i i + 1
+   ]
+
 
 end
 
@@ -559,6 +617,53 @@ Press [R] to Restart the Round\nPress [Space] to Start the Game\nPress the label
 12
 0.0
 0
+
+BUTTON
+760
+314
+823
+347
+Train
+train
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+SLIDER
+706
+359
+878
+392
+learningRate
+learningRate
+0.01
+1
+0.5
+0.01
+1
+NIL
+HORIZONTAL
+
+SLIDER
+705
+414
+877
+447
+discountFactor
+discountFactor
+0
+1
+0.01
+0.01
+1
+NIL
+HORIZONTAL
 
 @#$#@#$#@
 ## WHAT IS IT?
