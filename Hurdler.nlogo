@@ -1,3 +1,5 @@
+extensions [matrix]
+
 breed [players player]
 breed [blocks block]
 breed [flags flag]
@@ -5,7 +7,7 @@ breed [hurdles hurdle]
 breed [coins coin]
 
 ; the round has ended (by death or reaching the flag]
-globals[game-over]
+globals[game-over Q R]
 
 
 to setup
@@ -13,14 +15,13 @@ to setup
   reset-ticks
   set game-over false
 
+  ;--- Q Matrix with Height 4, Width 65
+  set Q matrix:make-constant 4 65 0
+
   setup-patches
   setup-hurdles
   setup-player
-
-
-
   setup-flag
-
   setup-coins
 
 
@@ -139,7 +140,7 @@ to setup-coins
 
   ask coin 12 [
     set xcor 10
-    set ycor 5
+    set ycor 4
   ]
 
   ask coin 13 [
@@ -156,11 +157,51 @@ end
 
 to go
   move-player
+  move-hurdle-one
+  tick
 end
 
 
+to move-hurdle-one
+  if ticks mod 40 = 0 [
+    ask hurdle 0 [
+      set xcor 20
+    ]
+    ask hurdle 1 [
+      set xcor 20
+    ]
+  ]
+  if ticks mod 40 = 5 [
+    ask hurdle 0 [
+      set xcor 21
+    ]
+    ask hurdle 1 [
+      set xcor 21
+    ]
+  ]
+  if ticks mod 40 = 10 [
+    ask hurdle 0 [
+      set xcor 22
+    ]
+    ask hurdle 1 [
+      set xcor 22
+    ]
+  ]
+  if ticks mod 40 = 15 [
+    ask hurdle 0 [
+      set xcor 21
+    ]
+    ask hurdle 1 [
+      set xcor 21
+    ]
+  ]
+
+
+end
+
 to move-player
   ask players [
+    pen-down
     ifelse xcor < 65 and not game-over [
       if  game-over [ stop ]
       forward 0.25
@@ -173,8 +214,6 @@ to move-player
     ]
     ]
   if  game-over [ stop ]
-
-  tick
 end
 
 to move-forward
@@ -208,6 +247,7 @@ to jump-regular
     ]
     set counter counter + 1
     tick
+    move-hurdle-one
   ]
   fall-down
 end
@@ -221,6 +261,7 @@ to jump-long
     ]
     set counter counter + 1
     tick
+    move-hurdle-one
   ]
   fall-down
 end
@@ -235,17 +276,17 @@ to jump-high
     ]
     set counter counter + 1
     tick
+    move-hurdle-one
   ]
   fall-down
 end
-
 
 @#$#@#$#@
 GRAPHICS-WINDOW
 210
 10
 930
-281
+271
 -1
 -1
 10.0
@@ -261,7 +302,7 @@ GRAPHICS-WINDOW
 0
 70
 -3
-20
+19
 1
 1
 1
