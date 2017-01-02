@@ -159,6 +159,7 @@ to go
   move-player
   move-hurdle-one
   tick
+  if game-over [stop]
 end
 
 
