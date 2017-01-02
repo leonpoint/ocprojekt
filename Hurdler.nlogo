@@ -7,22 +7,27 @@ breed [hurdles hurdle]
 breed [coins coin]
 
 ; the round has ended (by death or reaching the flag]
-globals[game-over Q R]
+globals[game-over Q-Matrix Relation-Matrix Gamma Reward-Matrix]
 
+; Actions
+; walk, regular, high, long
+;   0      1      2      3
 
 to setup
   clear-all
   reset-ticks
   set game-over false
 
-  ;--- Q Matrix with Height 4, Width 65
-  set Q matrix:make-constant 4 65 0
+  ;--- Q Matrix with height 65, Width 4
+  set Q-Matrix matrix:make-constant 65 4 0
 
   setup-patches
   setup-hurdles
   setup-player
   setup-flag
-  setup-coins
+  ;setup-coins
+
+  setup-Relation-Matrix
 
 
 end
@@ -281,6 +286,58 @@ to jump-high
   ]
   fall-down
 end
+
+
+to setup-Relation-Matrix
+  set Relation-Matrix matrix:make-constant 65 4 0
+  let i 0
+
+  ;-- walk
+  while [i < 65] [
+    matrix:set Relation-Matrix i 0 (i + 1)
+    set i (i + 1)
+  ]
+
+  set i 0
+  ;-- regular
+  while [i < 65] [
+    matrix:set Relation-Matrix i 1 (i + 4)
+    set i (i + 1)
+  ]
+
+  set i 0
+  ;-- long
+  while [i < 65] [
+    matrix:set Relation-Matrix i 2 (i + 6)
+    set i (i + 1)
+  ]
+
+  set i 0
+  ;-- high
+  while [i < 65] [
+    matrix:set Relation-Matrix i 3 (i + 4)
+    set i (i + 1)
+  ]
+
+  let f 0
+  let g 0
+  while [g < 65] [
+    set f 0
+    while [f < 4] [
+      if matrix:get Relation-Matrix g f > 65 [
+        matrix:set Relation-Matrix g f 65
+      ]
+      set f f + 1
+    ]
+    set g g + 1
+  ]
+
+  print matrix:pretty-print-text Relation-Matrix
+end
+
+
+
+
 
 @#$#@#$#@
 GRAPHICS-WINDOW
