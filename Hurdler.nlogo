@@ -7,7 +7,7 @@ breed [hurdles hurdle]
 breed [coins coin]
 
 
-globals[randhurdle game-over Q-Matrix Relation-Matrix Reward-Matrix Q_Size currentState nextState nextReward calculatedMax calculatedMaxIndex Action_Size action iter iteration-percentile goal-reached testing]
+globals[gotCoin randhurdle game-over Q-Matrix Relation-Matrix Reward-Matrix Q_Size currentState nextState nextReward calculatedMax calculatedMaxIndex Action_Size action iter iteration-percentile goal-reached testing]
 
 ; Actions
 ; walk, regular, long, high
@@ -45,7 +45,7 @@ to setup
   setup-hurdles
   setup-player
   setup-flag
-  ;setup-coins
+  setup-coins
 
   setup-Relation-Matrix
 
@@ -138,6 +138,7 @@ to chooseAction
     ]
     set i i + 1
   ]
+  ; TODO randomly explore if multiple actions have the same q value
 
 
 
@@ -174,6 +175,10 @@ to calculate-q
   if game-over = true and currentPos >= 64 [
     print "testtwo"
     set nextReward 100
+  ]
+  if game-over = false and gotCoin = true [
+    set nextReward 10
+
   ]
 
 
@@ -453,18 +458,18 @@ to setup-coins
     set color yellow
   ]
 
-  ask coin 12 [
+  ask coin 18 [
     set xcor 10
-    set ycor 4
+    set ycor 2
   ]
 
-  ask coin 13 [
-    set xcor 40
+  ask coin 19 [
+    set xcor 44
     set ycor 3
   ]
 
-  ask coin 14 [
-    set xcor 25
+  ask coin 20 [
+    set xcor 26
     set ycor 3
   ]
 
@@ -747,6 +752,9 @@ to move-player
       if count hurdles-here > 0 [
         set game-over true
       ]
+      if count coins-here > 0 [
+        set gotCoin true
+      ]
     ]
     [
       set game-over true
@@ -768,6 +776,9 @@ to walk
       if count hurdles-here > 0 [
         set game-over true
       ]
+      if count coins-here > 0 [
+        set gotCoin true
+      ]
     ]
     set counter counter + 1
     tick
@@ -786,6 +797,9 @@ to jump-regular
       set ycor ycor + 1
       if count hurdles-here > 0 [
         set game-over true
+      ]
+      if count coins-here > 0 [
+        set gotCoin true
       ]
     ]
   ]
@@ -812,6 +826,9 @@ to jump-long
       if count hurdles-here > 0 [
         set game-over true
       ]
+      if count coins-here > 0 [
+        set gotCoin true
+      ]
     ]
   ]
   while [counter < 24 and not game-over] [
@@ -837,6 +854,9 @@ to jump-high
       set ycor ycor + 1
       if count hurdles-here > 0 [
         set game-over true
+      ]
+      if count coins-here > 0 [
+        set gotCoin true
       ]
     ]
   ]
@@ -872,6 +892,9 @@ to fall-down
     set ycor 0
       if count hurdles-here > 0 [
         set game-over true
+      ]
+      if count coins-here > 0 [
+        set gotCoin true
       ]
   ]
 end
