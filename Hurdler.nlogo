@@ -10,7 +10,7 @@ breed [coins coin]
 globals[game-over Q-Matrix Relation-Matrix Iterations Reward-Matrix Q_Size currentState nextState nextReward calculatedMax calculatedMaxIndex Action_Size action]
 
 ; Actions
-; walk, regular, high, long
+; walk, regular, long, high
 ;   0      1      2      3
 
 ; Läuft noch weiter obwohl hintere Hürde berührt wird !!!!!!
@@ -24,7 +24,7 @@ to setup
   ;--- Q Matrix with height 65, Width 4
   set Q-Matrix matrix:make-constant 65 4 0
 
-  set Iterations 3000
+  set Iterations 40000
 
   set Q_Size 65
 
@@ -45,7 +45,7 @@ to setup
   setup-Reward-Matrix
 
   ;chess-like grid to improve readability
-  ask patches with [(pxcor + pycor) mod 2 = 0] [set pcolor 6]
+  ;ask patches with [(pxcor + pycor) mod 2 = 0] [set pcolor 6]
 end
 
 
@@ -70,6 +70,8 @@ end
 
 
 
+
+
 ;################################## q-learning-subprocedures ##################################
 
 
@@ -77,18 +79,19 @@ to episode
   while [not game-over] [
     chooseAction
 
-    if action = 0 [
-      walk
-    ]
-    if action = 1 [
-      jump-regular
-    ]
-    if action = 2 [
-      jump-high
-    ]
-    if action = 3 [
-      jump-high
-    ]
+
+;    if action = 0 [
+;      walk
+;    ]
+;    if action = 1 [
+;      jump-regular
+;    ]
+;    if action = 2 [
+;      jump-high
+;    ]
+;    if action = 3 [
+;      jump-long
+;    ]
 
 
     calculate-q
@@ -137,16 +140,45 @@ to calculate-q
     set game-over true
     print "goal reached"
   ]
+
+  ; normalize matrix
+  let i 0
+  let j 0
+  let maxValue -10000
+  while [i < 65] [
+    while [j < 4] [
+      if matrix:get Q-Matrix i j > maxValue [
+        set maxValue matrix:get Q-Matrix i j
+      ]
+      set j j + 1
+    ]
+    set i i + 1
+  ]
+
+  ; normalize matrix
+  set i 0
+  set j 0
+  while [i < 65] [
+    while [j < 4] [
+      if maxValue > 0 [
+        matrix:set Q-Matrix i j (matrix:get Q-Matrix i j) / maxValue
+      ]
+      set j j + 1
+    ]
+    set i i + 1
+  ]
+
+
 end
 
 
 to calculate-max
   set calculatedMax 0
   let i 0
-
+  let temp -1000
   ; mit hilfe der übergangsmatrix vom aktuellen State den maximal möglichen Reward finden
   while [ i < Action_Size ] [
-     let temp matrix:get Q-Matrix (matrix:get Relation-Matrix currentstate i) i
+     set temp matrix:get Q-Matrix (matrix:get Relation-Matrix currentstate i) i
      if temp > calculatedMax [
        set calculatedMax temp
        set calculatedMaxIndex i
@@ -155,15 +187,49 @@ to calculate-max
    ]
 end
 
-
 to test
   set currentState 0
+  ask players [
+    set xcor 0
+  ]
+  set game-over false
+  reset-ticks
 
-  while [currentState < 65] [
-    calculate-max
-    print "max:"
-    print calculatedMax
-    print calculatedMaxIndex
+  while [currentState < 64 and not game-over] [
+
+    let i 0
+    let temp 0
+    let maxVal -1000
+    let move -1
+    while [i < Action_Size] [
+      set temp matrix:get Q-Matrix currentState i
+      if temp > maxVal [
+        set maxVal temp
+        set move i
+      ]
+      set i i + 1
+    ]
+
+
+    print "currentState, max, jump type, nextState"
+    print currentState
+    print maxVal
+    print move
+    print matrix:get Relation-Matrix currentState move
+    set calculatedMaxIndex move
+
+    if calculatedMaxIndex = 0 [
+      walk
+    ]
+    if calculatedMaxIndex = 1 [
+      jump-regular
+    ]
+    if calculatedMaxIndex = 2 [
+      jump-long
+    ]
+    if calculatedMaxIndex = 3 [
+      jump-high
+    ]
     set currentState matrix:get Relation-Matrix currentState calculatedMaxIndex
   ]
 
@@ -362,7 +428,7 @@ to setup-Relation-Matrix
   ]
 
   set i 0
-  ;-- high
+  ;-- highl
   while [i < 65] [
     matrix:set Relation-Matrix i 3 (i + 4)
     set i (i + 1)
@@ -527,6 +593,9 @@ to walk
   while [counter < 4] [
     ask players [
       forward 0.25
+      if count hurdles-here > 0 [
+        set game-over true
+      ]
     ]
     set counter counter + 1
   ]
@@ -535,9 +604,16 @@ end
 
 to jump-regular
   let counter 0
+  repeat 3 [
+    ask players [
+      set ycor ycor + 1
+      if count hurdles-here > 0 [
+        set game-over true
+      ]
+    ]
+  ]
   while [counter < 16 and not game-over ] [
     ask players [
-      set ycor 3
       move-forward
     ]
     set counter counter + 1
@@ -550,9 +626,16 @@ end
 
 to jump-long
   let counter 0
+  repeat 3 [
+    ask players [
+      set ycor ycor + 1
+      if count hurdles-here > 0 [
+        set game-over true
+      ]
+    ]
+  ]
   while [counter < 24 and not game-over] [
     ask players [
-      set ycor 3
       move-forward
     ]
     set counter counter + 1
@@ -566,9 +649,16 @@ end
 ; jump 4 units wide, 4 units up
 to jump-high
   let counter 0
+  repeat 4 [
+    ask players [
+      set ycor ycor + 1
+      if count hurdles-here > 0 [
+        set game-over true
+      ]
+    ]
+  ]
   while [counter < 16 and not game-over] [
     ask players [
-      set ycor 4
       move-forward
     ]
     set counter counter + 1
@@ -584,7 +674,7 @@ to move-forward
     if xcor < 65 and not game-over [
       forward 0.25
       if count hurdles-here > 0 [
-        ;set game-over true
+        set game-over true
       ]
     ]
   ]
@@ -595,7 +685,7 @@ to fall-down
   ask players [
     set ycor 0
       if count hurdles-here > 0 [
-        ;set game-over true
+        set game-over true
       ]
   ]
 end
@@ -748,7 +838,7 @@ learningRate
 learningRate
 0.01
 1
-0.25
+1
 0.01
 1
 NIL
@@ -763,7 +853,7 @@ discountFactor
 discountFactor
 0
 1
-0
+0.38
 0.01
 1
 NIL
