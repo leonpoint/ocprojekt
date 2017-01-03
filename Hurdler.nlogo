@@ -6,8 +6,8 @@ breed [flags flag]
 breed [hurdles hurdle]
 breed [coins coin]
 
-; the round has ended (by death or reaching the flag]
-globals[game-over Q-Matrix Relation-Matrix Iterations Reward-Matrix Q_Size currentState nextState nextReward calculatedMax Action_Size action]
+
+globals[game-over Q-Matrix Relation-Matrix Iterations Reward-Matrix Q_Size currentState nextState nextReward calculatedMax calculatedMaxIndex Action_Size action]
 
 ; Actions
 ; walk, regular, high, long
@@ -24,7 +24,7 @@ to setup
   ;--- Q Matrix with height 65, Width 4
   set Q-Matrix matrix:make-constant 65 4 0
 
-  set Iterations 10000
+  set Iterations 3000
 
   set Q_Size 65
 
@@ -44,6 +44,7 @@ to setup
 
   setup-Reward-Matrix
 
+  ;chess-like grid to improve readability
   ask patches with [(pxcor + pycor) mod 2 = 0] [set pcolor 6]
 end
 
@@ -75,6 +76,21 @@ end
 to episode
   while [not game-over] [
     chooseAction
+
+    if action = 0 [
+      walk
+    ]
+    if action = 1 [
+      jump-regular
+    ]
+    if action = 2 [
+      jump-high
+    ]
+    if action = 3 [
+      jump-high
+    ]
+
+
     calculate-q
   ]
 
@@ -88,7 +104,7 @@ to episode
   set currentState 0
   set nextState 0
 
-  print "episode done"
+  ;print "episode done"
 end
 
 
@@ -115,10 +131,11 @@ to calculate-q
   set currentState nextState
 
   ; Matrix um 1 verschoben!!!
-  ask players [set xcor (currentState + 1)]
+  ;ask players [set xcor (currentState + 1)]
 
   if currentState > 63 [
     set game-over true
+    print "goal reached"
   ]
 end
 
@@ -132,11 +149,26 @@ to calculate-max
      let temp matrix:get Q-Matrix (matrix:get Relation-Matrix currentstate i) i
      if temp > calculatedMax [
        set calculatedMax temp
+       set calculatedMaxIndex i
      ]
      set i i + 1
    ]
 end
 
+
+to test
+  set currentState 0
+
+  while [currentState < 65] [
+    calculate-max
+    print "max:"
+    print calculatedMax
+    print calculatedMaxIndex
+    set currentState matrix:get Relation-Matrix currentState calculatedMaxIndex
+  ]
+
+
+end
 
 
 
@@ -411,33 +443,58 @@ to move-hurdle-one
   if ticks mod 40 = 0 [
     ask hurdle 0 [
       set xcor 20
+      if count players-here > 0 [
+        set game-over true
+      ]
     ]
+
     ask hurdle 1 [
       set xcor 20
+      if count players-here > 0 [
+        set game-over true
+      ]
     ]
   ]
   if ticks mod 40 = 5 [
     ask hurdle 0 [
       set xcor 21
+      if count players-here > 0 [
+        set game-over true
+      ]
     ]
     ask hurdle 1 [
       set xcor 21
+      if count players-here > 0 [
+        set game-over true
+      ]
     ]
   ]
   if ticks mod 40 = 10 [
     ask hurdle 0 [
       set xcor 22
+      if count players-here > 0 [
+        set game-over true
+      ]
     ]
     ask hurdle 1 [
       set xcor 22
+      if count players-here > 0 [
+        set game-over true
+      ]
     ]
   ]
   if ticks mod 40 = 15 [
     ask hurdle 0 [
       set xcor 21
+      if count players-here > 0 [
+        set game-over true
+      ]
     ]
     ask hurdle 1 [
       set xcor 21
+      if count players-here > 0 [
+        set game-over true
+      ]
     ]
   ]
 end
@@ -462,14 +519,16 @@ end
 
 
 
-
 ;################################## movement-subprocedures ##################################
 
 
 to walk
   let counter 0
   while [counter < 4] [
-    move-forward
+    ask players [
+      forward 0.25
+    ]
+    set counter counter + 1
   ]
 end
 
@@ -525,7 +584,7 @@ to move-forward
     if xcor < 65 and not game-over [
       forward 0.25
       if count hurdles-here > 0 [
-        set game-over true
+        ;set game-over true
       ]
     ]
   ]
@@ -536,7 +595,7 @@ to fall-down
   ask players [
     set ycor 0
       if count hurdles-here > 0 [
-        set game-over true
+        ;set game-over true
       ]
   ]
 end
@@ -689,7 +748,7 @@ learningRate
 learningRate
 0.01
 1
-0.5
+0.25
 0.01
 1
 NIL
@@ -704,11 +763,45 @@ discountFactor
 discountFactor
 0
 1
-0.75
+0
 0.01
 1
 NIL
 HORIZONTAL
+
+BUTTON
+832
+314
+895
+347
+Test
+test
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+466
+432
+529
+465
+Walk
+walk
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
 
 @#$#@#$#@
 ## WHAT IS IT?
