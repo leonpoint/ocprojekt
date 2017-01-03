@@ -7,7 +7,7 @@ breed [hurdles hurdle]
 breed [coins coin]
 
 
-globals[gotCoin randhurdle game-over Q-Matrix Relation-Matrix Reward-Matrix Q_Size currentState nextState nextReward calculatedMax calculatedMaxIndex Action_Size action iter iteration-percentile goal-reached testing]
+globals[hasJumped gotCoin randhurdle game-over Q-Matrix Relation-Matrix Reward-Matrix Q_Size currentState nextState nextReward calculatedMax calculatedMaxIndex Action_Size action iter iteration-percentile goal-reached testing]
 
 ; Actions
 ; walk, regular, long, high
@@ -40,6 +40,8 @@ to setup
   set testing false
 
   set randhurdle -1
+
+  set hasJumped false
 
   setup-patches
   setup-hurdles
@@ -126,19 +128,25 @@ end
 
 to chooseAction
 
-  ;set action random Action_Size
-  let i 0
-  let temp 0
-  let maxVal -1000
-  while [i < Action_Size] [
-    set temp matrix:get Q-Matrix currentState i
-    if temp > maxVal [
-      set maxVal temp
-      set action i
+
+  let actionlist []
+  let qlist matrix:get-row Q-Matrix currentState
+
+  let maximum max qlist
+  let j 0
+  while [j < Action_Size] [
+    let temp matrix:get Q-Matrix currentState j
+    if temp = maximum [
+      set actionlist lput j actionlist
     ]
-    set i i + 1
+    set j j + 1
   ]
-  ; TODO randomly explore if multiple actions have the same q value
+
+  set action one-of actionlist
+
+  if hasJumped [
+    set action 0
+  ]
 
 
 
@@ -460,7 +468,7 @@ to setup-coins
 
   ask coin 18 [
     set xcor 10
-    set ycor 2
+    set ycor 0
   ]
 
   ask coin 19 [
@@ -787,6 +795,7 @@ to walk
   if not testing [
     calculate-q
   ]
+  set hasJumped false
 end
 
 
@@ -897,6 +906,8 @@ to fall-down
         set gotCoin true
       ]
   ]
+  set hasJumped true
+
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
@@ -920,8 +931,8 @@ GRAPHICS-WINDOW
 70
 -3
 19
-1
-1
+0
+0
 1
 ticks
 60.0
@@ -1047,7 +1058,7 @@ learningRate
 learningRate
 0.01
 1
-0.45
+0.36
 0.01
 1
 NIL
@@ -1062,7 +1073,7 @@ discountFactor
 discountFactor
 0
 1
-0.18
+0.23
 0.01
 1
 NIL
@@ -1075,7 +1086,7 @@ BUTTON
 58
 Test
 test
-NIL
+T
 1
 T
 OBSERVER
