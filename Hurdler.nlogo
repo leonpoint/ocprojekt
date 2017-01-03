@@ -7,7 +7,7 @@ breed [hurdles hurdle]
 breed [coins coin]
 
 
-globals[game-over Q-Matrix Relation-Matrix Reward-Matrix Q_Size currentState nextState nextReward calculatedMax calculatedMaxIndex Action_Size action iter iteration-percentile goal-reached testing]
+globals[randhurdle game-over Q-Matrix Relation-Matrix Reward-Matrix Q_Size currentState nextState nextReward calculatedMax calculatedMaxIndex Action_Size action iter iteration-percentile goal-reached testing]
 
 ; Actions
 ; walk, regular, long, high
@@ -38,6 +38,8 @@ to setup
   set goal-reached 0
 
   set testing false
+
+  set randhurdle -1
 
   setup-patches
   setup-hurdles
@@ -81,6 +83,9 @@ end
 
 
 to episode
+
+  set randhurdle random 7
+
   while [not game-over] [
 
     ask players [
@@ -575,7 +580,10 @@ end
 
 
 to move-hurdle-one
-  if ticks mod 40 = 0 [
+
+  let hurdletick ticks + randhurdle
+
+  if hurdletick mod 10 = 0 [
     ask hurdle 0 [
       set xcor 20
       if count players-here > 0 [
@@ -590,13 +598,14 @@ to move-hurdle-one
       ]
     ]
   ]
-  if ticks mod 40 = 5 [
+  if hurdletick mod 10 = 1 [
     ask hurdle 0 [
       set xcor 21
       if count players-here > 0 [
         set game-over true
       ]
     ]
+
     ask hurdle 1 [
       set xcor 21
       if count players-here > 0 [
@@ -604,13 +613,14 @@ to move-hurdle-one
       ]
     ]
   ]
-  if ticks mod 40 = 10 [
+  if hurdletick mod 10 = 2 [
     ask hurdle 0 [
       set xcor 22
       if count players-here > 0 [
         set game-over true
       ]
     ]
+
     ask hurdle 1 [
       set xcor 22
       if count players-here > 0 [
@@ -618,13 +628,74 @@ to move-hurdle-one
       ]
     ]
   ]
-  if ticks mod 40 = 15 [
+  if hurdletick mod 10 = 3 [
+    ask hurdle 0 [
+      set xcor 23
+      if count players-here > 0 [
+        set game-over true
+      ]
+    ]
+
+    ask hurdle 1 [
+      set xcor 23
+      if count players-here > 0 [
+        set game-over true
+      ]
+    ]
+  ]
+  if hurdletick mod 10 = 4 [
+    ask hurdle 0 [
+      set xcor 24
+      if count players-here > 0 [
+        set game-over true
+      ]
+    ]
+
+    ask hurdle 1 [
+      set xcor 24
+      if count players-here > 0 [
+        set game-over true
+      ]
+    ]
+  ]
+  if hurdletick mod 10 = 5 [
+    ask hurdle 0 [
+      set xcor 23
+      if count players-here > 0 [
+        set game-over true
+      ]
+    ]
+
+    ask hurdle 1 [
+      set xcor 23
+      if count players-here > 0 [
+        set game-over true
+      ]
+    ]
+  ]
+  if hurdletick mod 10 = 6 [
+    ask hurdle 0 [
+      set xcor 22
+      if count players-here > 0 [
+        set game-over true
+      ]
+    ]
+
+    ask hurdle 1 [
+      set xcor 22
+      if count players-here > 0 [
+        set game-over true
+      ]
+    ]
+  ]
+  if hurdletick mod 10 = 7 [
     ask hurdle 0 [
       set xcor 21
       if count players-here > 0 [
         set game-over true
       ]
     ]
+
     ask hurdle 1 [
       set xcor 21
       if count players-here > 0 [
@@ -632,6 +703,38 @@ to move-hurdle-one
       ]
     ]
   ]
+  if hurdletick mod 10 = 8 [
+    ask hurdle 0 [
+      set xcor 20
+      if count players-here > 0 [
+        set game-over true
+      ]
+    ]
+
+    ask hurdle 1 [
+      set xcor 20
+      if count players-here > 0 [
+        set game-over true
+      ]
+    ]
+  ]
+
+  if hurdletick mod 10 = 9 [
+    ask hurdle 0 [
+      set xcor 20
+      if count players-here > 0 [
+        set game-over true
+      ]
+    ]
+
+    ask hurdle 1 [
+      set xcor 20
+      if count players-here > 0 [
+        set game-over true
+      ]
+    ]
+  ]
+
 end
 
 
@@ -667,6 +770,8 @@ to walk
       ]
     ]
     set counter counter + 1
+    tick
+    move-hurdle-one
   ]
   if not testing [
     calculate-q
@@ -792,8 +897,8 @@ GRAPHICS-WINDOW
 70
 -3
 19
-0
-0
+1
+1
 1
 ticks
 60.0
@@ -934,7 +1039,7 @@ discountFactor
 discountFactor
 0
 1
-0.73
+0.18
 0.01
 1
 NIL
@@ -994,7 +1099,7 @@ Iterations
 Iterations
 1000
 100000
-5000
+2000
 1000
 1
 NIL
