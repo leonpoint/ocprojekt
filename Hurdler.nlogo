@@ -48,7 +48,7 @@ to setup
   setup-Reward-Matrix
 
   ;chess-like grid to improve readability
-  ;ask patches with [(pxcor + pycor) mod 2 = 0] [set pcolor 6]
+  ask patches with [(pxcor + pycor) mod 2 = 0] [set pcolor 6]
 end
 
 
@@ -86,7 +86,18 @@ to episode
     ]
     chooseAction
 
-
+;    if action = 0 [
+;      walk
+;    ]
+;    if action = 1 [
+;      jump-regular
+;    ]
+;    if action = 2 [
+;      jump-long
+;    ]
+;    if action = 3 [
+;      jump-high
+;    ]
 
 
     calculate-q
@@ -427,7 +438,7 @@ to setup-Relation-Matrix
   ]
 
   set i 0
-  ;-- highl
+  ;-- high
   while [i < 65] [
     matrix:set Relation-Matrix i 3 (i + 4)
     set i (i + 1)
@@ -459,38 +470,38 @@ to setup-Reward-Matrix
 
 
   ;hurdle 1
-  matrix:set-row Reward-Matrix 19 [-1 -1 -1 -1]
+  matrix:set-row Reward-Matrix 19 [-10 -10 -10 -10]
 
   ;box 1
-  matrix:set Reward-Matrix 19 2 -1
-  matrix:set Reward-Matrix 20 2 -1
-  matrix:set Reward-Matrix 21 2 -1
-  matrix:set Reward-Matrix 22 2 -1
-  matrix:set Reward-Matrix 23 2 -1
+  matrix:set Reward-Matrix 19 2 -10
+  matrix:set Reward-Matrix 20 2 -10
+  matrix:set Reward-Matrix 21 2 -10
+  matrix:set Reward-Matrix 22 2 -10
+  matrix:set Reward-Matrix 23 2 -10
 
   ;hurdle 2
-  matrix:set-row Reward-Matrix 29 [-1 -1 -1 -1]
-  matrix:set-row Reward-Matrix 30 [-1 -1 -1 -1]
-  matrix:set-row Reward-Matrix 31 [-1 -1 -1 -1]
-  matrix:set-row Reward-Matrix 32 [-1 -1 -1 -1]
+  matrix:set-row Reward-Matrix 29 [-10 -10 -10 -10]
+  matrix:set-row Reward-Matrix 30 [-10 -10 -10 -10]
+  matrix:set-row Reward-Matrix 31 [-10 -10 -10 -10]
+  matrix:set-row Reward-Matrix 32 [-10 -10 -10 -10]
 
   ;hurdle 3
-  matrix:set-row Reward-Matrix 44 [-1 -1 -1 -1]
-  matrix:set-row Reward-Matrix 45 [0 -1 -1 0] ;-1 because long jump dies from box 2
-  matrix:set-row Reward-Matrix 46 [0 -1 -1 0]
-  matrix:set-row Reward-Matrix 47 [0 -1 -1 0]
-  matrix:set-row Reward-Matrix 48 [0 0 -1 0]
-  matrix:set-row Reward-Matrix 49 [0 0 -1 0]
+  matrix:set-row Reward-Matrix 44 [-10 -10 -10 -10]
+  matrix:set-row Reward-Matrix 45 [0 -10 0 -10] ;-10 because long jump dies from box 2
+  matrix:set-row Reward-Matrix 46 [0 -10 0 -10]
+  matrix:set-row Reward-Matrix 47 [0 -10 0 -10]
+  matrix:set-row Reward-Matrix 48 [0 0 0 -10]
+  matrix:set-row Reward-Matrix 49 [0 0 0 -10]
   ;box 2
-  matrix:set-row Reward-Matrix 37 [0 -1 -1 0]
-  matrix:set-row Reward-Matrix 38 [0 -1 -1 0]
-  matrix:set-row Reward-Matrix 39 [0 -1 -1 -1]
-  matrix:set-row Reward-Matrix 40 [0 -1 -1 -1]
-  matrix:set-row Reward-Matrix 41 [0 -1 -1 -1]
-  matrix:set-row Reward-Matrix 42 [0 -1 -1 -1]
-  matrix:set-row Reward-Matrix 43 [0 -1 -1 -1]
-  matrix:set-row Reward-Matrix 44 [0 0 -1 0]
-  matrix:set-row Reward-Matrix 45 [0 0 -1 0]
+  matrix:set-row Reward-Matrix 37 [0 -10 -10 0]
+  matrix:set-row Reward-Matrix 38 [0 -10 -10 0]
+  matrix:set-row Reward-Matrix 39 [0 -10 -10 -10]
+  matrix:set-row Reward-Matrix 40 [0 -10 -10 -10]
+  matrix:set-row Reward-Matrix 41 [0 -10 -10 -10]
+  matrix:set-row Reward-Matrix 42 [0 -10 -10 -10]
+  matrix:set-row Reward-Matrix 43 [0 -10 -10 -10]
+  matrix:set-row Reward-Matrix 44 [0 0 0 -10]
+  matrix:set-row Reward-Matrix 45 [0 0 0 -10]
 
 
   matrix:set-row Reward-Matrix 64 [100 100 100 100]
@@ -837,7 +848,7 @@ learningRate
 learningRate
 0.01
 1
-0.22
+0.09
 0.01
 1
 NIL
@@ -852,7 +863,7 @@ discountFactor
 discountFactor
 0
 1
-0.55
+0.13
 0.01
 1
 NIL
@@ -912,7 +923,7 @@ Iterations
 Iterations
 1000
 100000
-100000
+60000
 1000
 1
 NIL
