@@ -7,7 +7,7 @@ breed [hurdles hurdle]
 breed [coins coin]
 
 
-globals[game-over Q-Matrix Relation-Matrix Reward-Matrix Q_Size currentState nextState nextReward calculatedMax calculatedMaxIndex Action_Size action iter iteration-percentile goal-reached]
+globals[game-over Q-Matrix Relation-Matrix Reward-Matrix Q_Size currentState nextState nextReward calculatedMax calculatedMaxIndex Action_Size action iter iteration-percentile goal-reached testing]
 
 ; Actions
 ; walk, regular, long, high
@@ -36,6 +36,8 @@ to setup
   set iter 0
 
   set goal-reached 0
+
+  set testing false
 
   setup-patches
   setup-hurdles
@@ -99,8 +101,8 @@ to episode
       jump-high
     ]
 
-
-    calculate-q
+    ; wird jetzt nach dem jeweiligen move gemacht
+    ;calculate-q
   ]
 
   ask players [
@@ -139,11 +141,36 @@ end
 
 to calculate-q
   set nextState matrix:get Relation-Matrix currentState action
-  set nextReward matrix:get Reward-Matrix nextState action
+  ;set nextReward matrix:get Reward-Matrix nextState action
 
-  if nextReward = -1 [
-    set game-over true
+  ;if nextReward = -1 [
+  ;  set game-over true
+  ;]
+
+  let currentPos -1
+  ask players [
+    set currentPos xcor
   ]
+
+
+  if currentPos > 64 [
+    set game-over true
+    set goal-reached goal-reached + 1
+  ]
+
+  ; nothing happened
+  set nextReward 0
+  ; player died, negative reward
+  if game-over = true and currentPos < 64 [
+    print "testone"
+    set nextReward -10
+  ]
+  ; player won, positive reward
+  if game-over = true and currentPos >= 64 [
+    print "testtwo"
+    set nextReward 100
+  ]
+
 
   calculate-max
 
@@ -155,10 +182,7 @@ to calculate-q
   ; Matrix um 1 verschoben!!!
   ;ask players [set xcor (currentState + 1)]
 
-  if currentState > 64 [
-    set game-over true
-    set goal-reached goal-reached + 1
-  ]
+
 
   ; normalize matrix
   let i 0
@@ -207,6 +231,7 @@ to calculate-max
 end
 
 to test
+  set testing true
   clear-drawing
 
   set currentState 0
@@ -218,10 +243,23 @@ to test
   set game-over false
   reset-ticks
 
-  while [currentState < 64 and not game-over] [
+
+
+  while [currentState < 66 and not game-over] [
+
+  let currentPos -1
+  ask players [
+    set currentPos xcor
+  ]
+
+
+  if currentPos > 64 [
+    set game-over true
+    set goal-reached goal-reached + 1
+  ]
 
     let i 0
-    let temp 0
+    let temp -1
     let maxVal -1000
     let move -1
     while [i < Action_Size] [
@@ -255,6 +293,8 @@ to test
     ]
     set currentState matrix:get Relation-Matrix currentState calculatedMaxIndex
   ]
+
+  set testing false
 
 
 end
@@ -523,7 +563,7 @@ to setup-Reward-Matrix
 ;  matrix:set-row Reward-Matrix 45 [0 0 0 -10]
 
 
-  matrix:set-row Reward-Matrix 64 [100 100 100 100]
+  matrix:set-row Reward-Matrix 65 [100 100 100 100]
 
   ;print matrix:pretty-print-text Reward-Matrix
 end
@@ -628,6 +668,9 @@ to walk
     ]
     set counter counter + 1
   ]
+  if not testing [
+    calculate-q
+  ]
 end
 
 
@@ -650,6 +693,9 @@ to jump-regular
     move-hurdle-one
   ]
   fall-down
+  if not testing [
+    calculate-q
+  ]
 end
 
 
@@ -672,6 +718,9 @@ to jump-long
     move-hurdle-one
   ]
   fall-down
+  if not testing [
+    calculate-q
+  ]
 end
 
 
@@ -695,6 +744,9 @@ to jump-high
     move-hurdle-one
   ]
   fall-down
+  if not testing [
+    calculate-q
+  ]
 end
 
 
@@ -867,7 +919,7 @@ learningRate
 learningRate
 0.01
 1
-0.46
+0.45
 0.01
 1
 NIL
@@ -882,7 +934,7 @@ discountFactor
 discountFactor
 0
 1
-0
+0.73
 0.01
 1
 NIL
@@ -942,7 +994,7 @@ Iterations
 Iterations
 1000
 100000
-1000
+5000
 1000
 1
 NIL
