@@ -21,8 +21,8 @@ to setup
   reset-ticks
   set game-over false
 
-  ;--- Q Matrix with height 65, Width 4
-  set Q-Matrix matrix:make-constant 65 4 0
+  ;--- Q Matrix with height 66, Width 4
+  set Q-Matrix matrix:make-constant 66 4 0
 
 
   set Q_Size 65
@@ -142,7 +142,7 @@ to calculate-q
   ; Matrix um 1 verschoben!!!
   ;ask players [set xcor (currentState + 1)]
 
-  if currentState > 63 [
+  if currentState > 64 [
     set game-over true
     set goal-reached goal-reached + 1
   ]
@@ -414,43 +414,43 @@ end
 
 
 to setup-Relation-Matrix
-  set Relation-Matrix matrix:make-constant 65 4 0
+  set Relation-Matrix matrix:make-constant 66 4 0
   let i 0
 
   ;-- walk
-  while [i < 65] [
+  while [i < 66] [
     matrix:set Relation-Matrix i 0 (i + 1)
     set i (i + 1)
   ]
 
   set i 0
   ;-- regular
-  while [i < 65] [
+  while [i < 66] [
     matrix:set Relation-Matrix i 1 (i + 4)
     set i (i + 1)
   ]
 
   set i 0
   ;-- long
-  while [i < 65] [
+  while [i < 66] [
     matrix:set Relation-Matrix i 2 (i + 6)
     set i (i + 1)
   ]
 
   set i 0
   ;-- high
-  while [i < 65] [
+  while [i < 66] [
     matrix:set Relation-Matrix i 3 (i + 4)
     set i (i + 1)
   ]
 
   let f 0
   let g 0
-  while [g < 65] [
+  while [g < 66] [
     set f 0
     while [f < 4] [
-      if matrix:get Relation-Matrix g f > 64 [
-        matrix:set Relation-Matrix g f 64
+      if matrix:get Relation-Matrix g f > 65 [
+        matrix:set Relation-Matrix g f 65
       ]
       set f f + 1
     ]
@@ -459,49 +459,55 @@ to setup-Relation-Matrix
 
   ;print matrix:pretty-print-text Relation-Matrix
 end
-
+; Actions
+; walk, regular, long, high
+;   0      1      2      3
 
 ; for hurdles, anything that lands in it is -1
 ; for boxes, check where the jump was made (for every jump), and set the matrix where it lands to -1
 
 to setup-Reward-Matrix
-  set Reward-Matrix matrix:make-constant 65 4 0
+  set Reward-Matrix matrix:make-constant 66 4 0
   let i 0
 
 
   ;hurdle 1
-  matrix:set-row Reward-Matrix 19 [-10 -10 -10 -10]
+  matrix:set-row Reward-Matrix 20 [-10 -10 -10 -10]
 
   ;box 1
-  matrix:set Reward-Matrix 19 2 -10
-  matrix:set Reward-Matrix 20 2 -10
-  matrix:set Reward-Matrix 21 2 -10
-  matrix:set Reward-Matrix 22 2 -10
-  matrix:set Reward-Matrix 23 2 -10
+  matrix:set Reward-Matrix 20 3 -10
+  matrix:set Reward-Matrix 21 3 -10
+  matrix:set Reward-Matrix 22 3 -10
+  matrix:set Reward-Matrix 23 3 -10
+  matrix:set Reward-Matrix 24 3 -10
 
   ;hurdle 2
-  matrix:set-row Reward-Matrix 29 [-10 -10 -10 -10]
   matrix:set-row Reward-Matrix 30 [-10 -10 -10 -10]
   matrix:set-row Reward-Matrix 31 [-10 -10 -10 -10]
   matrix:set-row Reward-Matrix 32 [-10 -10 -10 -10]
+  matrix:set-row Reward-Matrix 33 [-10 -10 -10 -10]
 
   ;hurdle 3
-  matrix:set-row Reward-Matrix 44 [-10 -10 -10 -10]
-  matrix:set-row Reward-Matrix 45 [0 -10 0 -10] ;-10 because long jump dies from box 2
-  matrix:set-row Reward-Matrix 46 [0 -10 0 -10]
-  matrix:set-row Reward-Matrix 47 [0 -10 0 -10]
-  matrix:set-row Reward-Matrix 48 [0 0 0 -10]
-  matrix:set-row Reward-Matrix 49 [0 0 0 -10]
+  matrix:set-row Reward-Matrix 45 [-10 -10 -10 -10]
+  ;codes the other jump types
+  matrix:set-row Reward-Matrix 46 [0 -10 -10 0] ;-10 because long jump dies from box 2
+  matrix:set-row Reward-Matrix 47 [0 -10 -10 0]
+  matrix:set-row Reward-Matrix 48 [0 -10 -10 0]
+  matrix:set-row Reward-Matrix 49 [0 0 -10 0]
+  matrix:set-row Reward-Matrix 50 [0 0 -10 0]
   ;box 2
-  matrix:set-row Reward-Matrix 37 [0 -10 -10 0]
-  matrix:set-row Reward-Matrix 38 [0 -10 -10 0]
-  matrix:set-row Reward-Matrix 39 [0 -10 -10 -10]
+  matrix:set-row Reward-Matrix 38 [0 -10 0 -10] ; long jump berücksichtigen
+  matrix:set-row Reward-Matrix 39 [0 -10 0 -10]
   matrix:set-row Reward-Matrix 40 [0 -10 -10 -10]
   matrix:set-row Reward-Matrix 41 [0 -10 -10 -10]
   matrix:set-row Reward-Matrix 42 [0 -10 -10 -10]
   matrix:set-row Reward-Matrix 43 [0 -10 -10 -10]
-  matrix:set-row Reward-Matrix 44 [0 0 0 -10]
-  matrix:set-row Reward-Matrix 45 [0 0 0 -10]
+  matrix:set-row Reward-Matrix 44 [0 -10 -10 -10]
+
+
+;  ;Achtung: Überschreibt vorherige Angaben
+;  matrix:set-row Reward-Matrix 45 [0 0 0 -10]
+;  matrix:set-row Reward-Matrix 45 [0 0 0 -10]
 
 
   matrix:set-row Reward-Matrix 64 [100 100 100 100]
@@ -848,7 +854,7 @@ learningRate
 learningRate
 0.01
 1
-0.09
+0.31
 0.01
 1
 NIL
@@ -863,7 +869,7 @@ discountFactor
 discountFactor
 0
 1
-0.13
+0.1
 0.01
 1
 NIL
@@ -923,7 +929,7 @@ Iterations
 Iterations
 1000
 100000
-60000
+1000
 1000
 1
 NIL
