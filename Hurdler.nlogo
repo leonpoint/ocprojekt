@@ -7,7 +7,7 @@ breed [hurdles hurdle]
 breed [coins coin]
 
 
-globals[game-over Q-Matrix Relation-Matrix Iterations Reward-Matrix Q_Size currentState nextState nextReward calculatedMax calculatedMaxIndex Action_Size action]
+globals[game-over Q-Matrix Relation-Matrix Reward-Matrix Q_Size currentState nextState nextReward calculatedMax calculatedMaxIndex Action_Size action iter iteration-percentile goal-reached]
 
 ; Actions
 ; walk, regular, long, high
@@ -24,7 +24,6 @@ to setup
   ;--- Q Matrix with height 65, Width 4
   set Q-Matrix matrix:make-constant 65 4 0
 
-  set Iterations 40000
 
   set Q_Size 65
 
@@ -33,6 +32,10 @@ to setup
   set currentState 0
 
   set nextState 0
+
+  set iter 0
+
+  set goal-reached 0
 
   setup-patches
   setup-hurdles
@@ -58,13 +61,13 @@ end
 
 
 to train
-  let iter 0
-  while [iter < Iterations] [
-    episode
-    set iter iter + 1
-  ]
+  episode
+  set iter iter + 1
+ ; print "Percentile of Iterations done:"
+  set iteration-percentile 100 * iter / Iterations
+  if iter = Iterations [stop]
 
-  print matrix:pretty-print-text Q-Matrix
+  ;print matrix:pretty-print-text Q-Matrix
 end
 
 
@@ -77,21 +80,13 @@ end
 
 to episode
   while [not game-over] [
+
+    ask players [
+      pen-down
+    ]
     chooseAction
 
 
-;    if action = 0 [
-;      walk
-;    ]
-;    if action = 1 [
-;      jump-regular
-;    ]
-;    if action = 2 [
-;      jump-high
-;    ]
-;    if action = 3 [
-;      jump-long
-;    ]
 
 
     calculate-q
@@ -138,7 +133,7 @@ to calculate-q
 
   if currentState > 63 [
     set game-over true
-    print "goal reached"
+    set goal-reached goal-reached + 1
   ]
 
   ; normalize matrix
@@ -188,9 +183,13 @@ to calculate-max
 end
 
 to test
+  clear-drawing
+
   set currentState 0
   ask players [
+    pen-up
     set xcor 0
+    pen-down
   ]
   set game-over false
   reset-ticks
@@ -477,11 +476,11 @@ to setup-Reward-Matrix
 
   ;hurdle 3
   matrix:set-row Reward-Matrix 44 [-1 -1 -1 -1]
-  matrix:set-row Reward-Matrix 45 [0 -1 0 -1] ;-1 because long jump dies from box 2
-  matrix:set-row Reward-Matrix 46 [0 -1 0 -1]
-  matrix:set-row Reward-Matrix 47 [0 -1 0 -1]
-  matrix:set-row Reward-Matrix 48 [0 0 0 -1]
-  matrix:set-row Reward-Matrix 49 [0 0 0 -1]
+  matrix:set-row Reward-Matrix 45 [0 -1 -1 0] ;-1 because long jump dies from box 2
+  matrix:set-row Reward-Matrix 46 [0 -1 -1 0]
+  matrix:set-row Reward-Matrix 47 [0 -1 -1 0]
+  matrix:set-row Reward-Matrix 48 [0 0 -1 0]
+  matrix:set-row Reward-Matrix 49 [0 0 -1 0]
   ;box 2
   matrix:set-row Reward-Matrix 37 [0 -1 -1 0]
   matrix:set-row Reward-Matrix 38 [0 -1 -1 0]
@@ -490,8 +489,8 @@ to setup-Reward-Matrix
   matrix:set-row Reward-Matrix 41 [0 -1 -1 -1]
   matrix:set-row Reward-Matrix 42 [0 -1 -1 -1]
   matrix:set-row Reward-Matrix 43 [0 -1 -1 -1]
-  matrix:set-row Reward-Matrix 44 [0 0 0 -1]
-  matrix:set-row Reward-Matrix 45 [0 0 0 -1]
+  matrix:set-row Reward-Matrix 44 [0 0 -1 0]
+  matrix:set-row Reward-Matrix 45 [0 0 -1 0]
 
 
   matrix:set-row Reward-Matrix 64 [100 100 100 100]
@@ -813,13 +812,13 @@ Press [R] to Restart the Round\nPress [Space] to Start the Game\nPress the label
 0
 
 BUTTON
-760
-314
-823
-347
+953
+25
+1016
+58
 Train
 train
-NIL
+T
 1
 T
 OBSERVER
@@ -830,40 +829,40 @@ NIL
 1
 
 SLIDER
-706
-359
-878
-392
+948
+191
+1120
+224
 learningRate
 learningRate
 0.01
 1
-1
+0.22
 0.01
 1
 NIL
 HORIZONTAL
 
 SLIDER
-705
-414
-877
-447
+949
+248
+1121
+281
 discountFactor
 discountFactor
 0
 1
-0.38
+0.55
 0.01
 1
 NIL
 HORIZONTAL
 
 BUTTON
-832
-314
-895
-347
+1025
+25
+1088
+58
 Test
 test
 NIL
@@ -892,6 +891,43 @@ NIL
 NIL
 NIL
 1
+
+MONITOR
+947
+135
+1096
+180
+Percentage of Iterations
+iteration-percentile
+1
+1
+11
+
+SLIDER
+946
+82
+1095
+115
+Iterations
+Iterations
+1000
+100000
+100000
+1000
+1
+NIL
+HORIZONTAL
+
+MONITOR
+1122
+135
+1211
+180
+Goal Reached
+goal-reached
+1
+1
+11
 
 @#$#@#$#@
 ## WHAT IS IT?
