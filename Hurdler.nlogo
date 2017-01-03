@@ -86,18 +86,18 @@ to episode
     ]
     chooseAction
 
-;    if action = 0 [
-;      walk
-;    ]
-;    if action = 1 [
-;      jump-regular
-;    ]
-;    if action = 2 [
-;      jump-long
-;    ]
-;    if action = 3 [
-;      jump-high
-;    ]
+    if action = 0 [
+      walk
+    ]
+    if action = 1 [
+      jump-regular
+    ]
+    if action = 2 [
+      jump-long
+    ]
+    if action = 3 [
+      jump-high
+    ]
 
 
     calculate-q
@@ -119,7 +119,20 @@ end
 
 to chooseAction
 
-  set action random Action_Size
+  ;set action random Action_Size
+  let i 0
+  let temp 0
+  let maxVal -1000
+  while [i < Action_Size] [
+    set temp matrix:get Q-Matrix currentState i
+    if temp > maxVal [
+      set maxVal temp
+      set action i
+    ]
+    set i i + 1
+  ]
+
+
 
 end
 
@@ -854,7 +867,7 @@ learningRate
 learningRate
 0.01
 1
-0.31
+0.46
 0.01
 1
 NIL
@@ -869,7 +882,7 @@ discountFactor
 discountFactor
 0
 1
-0.1
+0
 0.01
 1
 NIL
