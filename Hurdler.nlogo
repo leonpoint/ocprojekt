@@ -7,7 +7,7 @@ breed [hurdles hurdle]
 breed [coins coin]
 
 
-globals[hasJumped gotCoin randhurdle game-over Q-Matrix Relation-Matrix Reward-Matrix Q_Size currentState nextState nextReward calculatedMax calculatedMaxIndex Action_Size action iter iteration-percentile goal-reached testing]
+globals[Q-Matrix Relation-Matrix Reward-Matrix Q_Size Action_Size currentState nextState nextReward calculatedMax calculatedMaxIndex action iter iteration-percentile goalReached testRun hasJumped gotCoin randHurdle gameOver ]
 
 ; Actions
 ; walk, regular, long, high
@@ -18,8 +18,8 @@ globals[hasJumped gotCoin randhurdle game-over Q-Matrix Relation-Matrix Reward-M
 
 to setup
   clear-all
-  reset-ticks
-  set game-over false
+
+  set gameOver false
 
   ;--- Q Matrix with height 66, Width 4
   set Q-Matrix matrix:make-constant 66 4 0
@@ -35,11 +35,11 @@ to setup
 
   set iter 0
 
-  set goal-reached 0
+  set goalReached 0
 
-  set testing false
+  set testRun false
 
-  set randhurdle -1
+  set randHurdle -1
 
   set hasJumped false
 
@@ -55,6 +55,8 @@ to setup
 
   ;chess-like grid to improve readability
   ask patches with [(pxcor + pycor) mod 2 = 0] [set pcolor 6]
+
+  reset-ticks
 end
 
 
@@ -62,7 +64,7 @@ to go
   move-player
   move-hurdle-one
   tick
-  if game-over [stop]
+  if gameOver [stop]
 end
 
 
@@ -86,9 +88,9 @@ end
 
 to episode
 
-  set randhurdle random 7
+  set randHurdle random 7
 
-  while [not game-over] [
+  while [not gameOver] [
 
     ask players [
       pen-down
@@ -117,7 +119,7 @@ to episode
   ]
   reset-ticks
 
-  set game-over false
+  set gameOver false
 
   set currentState 0
   set nextState 0
@@ -164,7 +166,7 @@ to calculate-q
   ;set nextReward matrix:get Reward-Matrix nextState action
 
   ;if nextReward = -1 [
-  ;  set game-over true
+  ;  set gameOver true
   ;]
 
   let currentPos -1
@@ -174,23 +176,23 @@ to calculate-q
 
 
   if currentPos > 64 [
-    set game-over true
-    set goal-reached goal-reached + 1
+    set gameOver true
+    set goalReached goalReached + 1
   ]
 
   ; nothing happened
   set nextReward 0
   ; player died, negative reward
-  if game-over = true and currentPos < 64 [
+  if gameOver = true and currentPos < 64 [
     print "testone"
     set nextReward -10
   ]
   ; player won, positive reward
-  if game-over = true and currentPos >= 64 [
+  if gameOver = true and currentPos >= 64 [
     print "testtwo"
     set nextReward 100
   ]
-  if game-over = false and gotCoin = true [
+  if gameOver = false and gotCoin = true [
     set nextReward 10
 
   ]
@@ -255,7 +257,7 @@ to calculate-max
 end
 
 to test
-  set testing true
+  set testRun true
   clear-drawing
 
   set currentState 0
@@ -264,12 +266,12 @@ to test
     set xcor 0
     pen-down
   ]
-  set game-over false
+  set gameOver false
   reset-ticks
 
 
 
-  while [currentState < 66 and not game-over] [
+  while [currentState < 66 and not gameOver] [
 
   let currentPos -1
   ask players [
@@ -278,8 +280,8 @@ to test
 
 
   if currentPos > 64 [
-    set game-over true
-    set goal-reached goal-reached + 1
+    set gameOver true
+    set goalReached goalReached + 1
   ]
 
     let i 0
@@ -318,7 +320,7 @@ to test
     set currentState matrix:get Relation-Matrix currentState calculatedMaxIndex
   ]
 
-  set testing false
+  set testRun false
 
 
 end
@@ -600,20 +602,20 @@ end
 
 to move-hurdle-one
 
-  let hurdletick ticks + randhurdle
+  let hurdletick ticks + randHurdle
 
   if hurdletick mod 10 = 0 [
     ask hurdle 0 [
       set xcor 20
       if count players-here > 0 [
-        set game-over true
+        set gameOver true
       ]
     ]
 
     ask hurdle 1 [
       set xcor 20
       if count players-here > 0 [
-        set game-over true
+        set gameOver true
       ]
     ]
   ]
@@ -621,14 +623,14 @@ to move-hurdle-one
     ask hurdle 0 [
       set xcor 21
       if count players-here > 0 [
-        set game-over true
+        set gameOver true
       ]
     ]
 
     ask hurdle 1 [
       set xcor 21
       if count players-here > 0 [
-        set game-over true
+        set gameOver true
       ]
     ]
   ]
@@ -636,14 +638,14 @@ to move-hurdle-one
     ask hurdle 0 [
       set xcor 22
       if count players-here > 0 [
-        set game-over true
+        set gameOver true
       ]
     ]
 
     ask hurdle 1 [
       set xcor 22
       if count players-here > 0 [
-        set game-over true
+        set gameOver true
       ]
     ]
   ]
@@ -651,14 +653,14 @@ to move-hurdle-one
     ask hurdle 0 [
       set xcor 23
       if count players-here > 0 [
-        set game-over true
+        set gameOver true
       ]
     ]
 
     ask hurdle 1 [
       set xcor 23
       if count players-here > 0 [
-        set game-over true
+        set gameOver true
       ]
     ]
   ]
@@ -666,14 +668,14 @@ to move-hurdle-one
     ask hurdle 0 [
       set xcor 24
       if count players-here > 0 [
-        set game-over true
+        set gameOver true
       ]
     ]
 
     ask hurdle 1 [
       set xcor 24
       if count players-here > 0 [
-        set game-over true
+        set gameOver true
       ]
     ]
   ]
@@ -681,14 +683,14 @@ to move-hurdle-one
     ask hurdle 0 [
       set xcor 23
       if count players-here > 0 [
-        set game-over true
+        set gameOver true
       ]
     ]
 
     ask hurdle 1 [
       set xcor 23
       if count players-here > 0 [
-        set game-over true
+        set gameOver true
       ]
     ]
   ]
@@ -696,14 +698,14 @@ to move-hurdle-one
     ask hurdle 0 [
       set xcor 22
       if count players-here > 0 [
-        set game-over true
+        set gameOver true
       ]
     ]
 
     ask hurdle 1 [
       set xcor 22
       if count players-here > 0 [
-        set game-over true
+        set gameOver true
       ]
     ]
   ]
@@ -711,14 +713,14 @@ to move-hurdle-one
     ask hurdle 0 [
       set xcor 21
       if count players-here > 0 [
-        set game-over true
+        set gameOver true
       ]
     ]
 
     ask hurdle 1 [
       set xcor 21
       if count players-here > 0 [
-        set game-over true
+        set gameOver true
       ]
     ]
   ]
@@ -726,14 +728,14 @@ to move-hurdle-one
     ask hurdle 0 [
       set xcor 20
       if count players-here > 0 [
-        set game-over true
+        set gameOver true
       ]
     ]
 
     ask hurdle 1 [
       set xcor 20
       if count players-here > 0 [
-        set game-over true
+        set gameOver true
       ]
     ]
   ]
@@ -742,14 +744,14 @@ to move-hurdle-one
     ask hurdle 0 [
       set xcor 20
       if count players-here > 0 [
-        set game-over true
+        set gameOver true
       ]
     ]
 
     ask hurdle 1 [
       set xcor 20
       if count players-here > 0 [
-        set game-over true
+        set gameOver true
       ]
     ]
   ]
@@ -760,21 +762,21 @@ end
 to move-player
   ask players [
     pen-down
-    ifelse xcor < 65 and not game-over [
-      if  game-over [ stop ]
+    ifelse xcor < 65 and not gameOver [
+      if  gameOver [ stop ]
       forward 0.25
       if count hurdles-here > 0 [
-        set game-over true
+        set gameOver true
       ]
       if count coins-here > 0 [
         set gotCoin true
       ]
     ]
     [
-      set game-over true
+      set gameOver true
     ]
     ]
-  if  game-over [ stop ]
+  if  gameOver [ stop ]
 end
 
 
@@ -788,7 +790,7 @@ to walk
     ask players [
       forward 0.25
       if count hurdles-here > 0 [
-        set game-over true
+        set gameOver true
       ]
       if count coins-here > 0 [
         set gotCoin true
@@ -798,7 +800,7 @@ to walk
     tick
     move-hurdle-one
   ]
-  if not testing [
+  if not testRun [
     calculate-q
   ]
   set hasJumped false
@@ -811,14 +813,14 @@ to jump-regular
     ask players [
       set ycor ycor + 1
       if count hurdles-here > 0 [
-        set game-over true
+        set gameOver true
       ]
       if count coins-here > 0 [
         set gotCoin true
       ]
     ]
   ]
-  while [counter < 16 and not game-over ] [
+  while [counter < 16 and not gameOver ] [
     ask players [
       move-forward
     ]
@@ -827,7 +829,7 @@ to jump-regular
     move-hurdle-one
   ]
   fall-down
-  if not testing [
+  if not testRun [
     calculate-q
   ]
 end
@@ -839,14 +841,14 @@ to jump-long
     ask players [
       set ycor ycor + 1
       if count hurdles-here > 0 [
-        set game-over true
+        set gameOver true
       ]
       if count coins-here > 0 [
         set gotCoin true
       ]
     ]
   ]
-  while [counter < 24 and not game-over] [
+  while [counter < 24 and not gameOver] [
     ask players [
       move-forward
     ]
@@ -855,7 +857,7 @@ to jump-long
     move-hurdle-one
   ]
   fall-down
-  if not testing [
+  if not testRun [
     calculate-q
   ]
 end
@@ -868,14 +870,14 @@ to jump-high
     ask players [
       set ycor ycor + 1
       if count hurdles-here > 0 [
-        set game-over true
+        set gameOver true
       ]
       if count coins-here > 0 [
         set gotCoin true
       ]
     ]
   ]
-  while [counter < 16 and not game-over] [
+  while [counter < 16 and not gameOver] [
     ask players [
       move-forward
     ]
@@ -884,7 +886,7 @@ to jump-high
     move-hurdle-one
   ]
   fall-down
-  if not testing [
+  if not testRun [
     calculate-q
   ]
 end
@@ -892,10 +894,10 @@ end
 
 to move-forward
   ask players [
-    if xcor < 65 and not game-over [
+    if xcor < 65 and not gameOver [
       forward 0.25
       if count hurdles-here > 0 [
-        set game-over true
+        set gameOver true
       ]
     ]
   ]
@@ -906,7 +908,7 @@ to fall-down
   ask players [
     set ycor 0
       if count hurdles-here > 0 [
-        set game-over true
+        set gameOver true
       ]
       if count coins-here > 0 [
         set gotCoin true
@@ -1009,7 +1011,7 @@ NIL
 D
 NIL
 NIL
-1
+0
 
 BUTTON
 512
@@ -1102,33 +1104,16 @@ NIL
 NIL
 1
 
-BUTTON
-466
-432
-529
-465
-Walk
-walk
-NIL
-1
-T
-OBSERVER
-NIL
-NIL
-NIL
-NIL
-1
-
 MONITOR
 1024
 130
-1156
-175
+1191
+179
 Percentage of Iterations
 iteration-percentile
 1
 1
-11
+12
 
 SLIDER
 946
@@ -1146,26 +1131,26 @@ NIL
 HORIZONTAL
 
 MONITOR
-1166
+1206
 130
-1241
-175
+1293
+179
 Goal Reached
-goal-reached
+goalReached
 1
 1
-11
+12
 
 MONITOR
 947
 130
-1014
-175
+1020
+179
 Iterations
 iter
 0
 1
-11
+12
 
 @#$#@#$#@
 ## WHAT IS IT?
