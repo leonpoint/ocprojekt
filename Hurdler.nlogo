@@ -50,7 +50,7 @@ end
 to train
   episode
   set iter iter + 1
- ; print "Percentile of Iterations done:"
+
   set iteration-percentile 100 * iter / Iterations
   if iter = Iterations [stop]
 
@@ -103,7 +103,7 @@ to episode
   set currentState 0
   set nextState 0
 
-  ;print "episode done"
+
 end
 
 
@@ -163,12 +163,10 @@ to calculate-q
   set nextReward 0
   ; player died, negative reward
   if gameOver = true and currentPos < 64 [
-    print "testone"
     set nextReward -10
   ]
   ; player won, positive reward
   if gameOver = true and currentPos >= 64 [
-    print "testtwo"
     set nextReward 100
   ]
   if gameOver = false and gotCoin = true [
@@ -276,12 +274,6 @@ to test
       set i i + 1
     ]
 
-
-    print "currentState, max, jump type, nextState"
-    print currentState
-    print maxVal
-    print move
-    print matrix:get Relation-Matrix currentState move
     set calculatedMaxIndex move
 
     if calculatedMaxIndex = 0 [
@@ -622,98 +614,74 @@ to move-hurdle-one-two
   if hurdletick mod 10 = 0 [
     ask hurdles with [hurdleNumber = 0] [
       set xcor 20
-      if count players-here > 0 [
-        set gameOver true
-      ]
+      check-player-colission
     ]
     ask hurdles with [hurdleNumber = 1] [
       set xcor 45
-      if count players-here > 0 [
-        set gameOver true
-      ]
+      check-player-colission
     ]
   ]
   if hurdletick mod 10 = 1 [
     ask hurdles with [hurdleNumber = 0] [
       set xcor 21
-      if count players-here > 0 [
-        set gameOver true
-      ]
+      check-player-colission
     ]
 
   ]
   if hurdletick mod 10 = 2 [
     ask hurdles with [hurdleNumber = 0] [
       set xcor 22
-      if count players-here > 0 [
-        set gameOver true
-      ]
+      check-player-colission
     ]
 
   ]
   if hurdletick mod 10 = 3 [
     ask hurdles with [hurdleNumber = 0] [
       set xcor 23
-      if count players-here > 0 [
-        set gameOver true
-      ]
+      check-player-colission
     ]
 
     ask hurdles with [hurdleNumber = 1] [
       set xcor 46
-      if count players-here > 0 [
-        set gameOver true
-      ]
+      check-player-colission
     ]
   ]
   if hurdletick mod 10 = 4 [
     ask hurdles with [hurdleNumber = 0] [
       set xcor 24
-      if count players-here > 0 [
-        set gameOver true
-      ]
+      check-player-colission
     ]
 
   ]
   if hurdletick mod 10 = 5 [
     ask hurdles with [hurdleNumber = 0] [
       set xcor 23
-      if count players-here > 0 [
-        set gameOver true
-      ]
+      check-player-colission
     ]
 
   ]
   if hurdletick mod 10 = 6 [
     ask hurdles with [hurdleNumber = 0] [
       set xcor 22
-      if count players-here > 0 [
-        set gameOver true
-      ]
+      check-player-colission
     ]
 
     ask hurdles with [hurdleNumber = 1] [
       set xcor 47
-      if count players-here > 0 [
-        set gameOver true
-      ]
+      check-player-colission
     ]
   ]
   if hurdletick mod 10 = 7 [
     ask hurdles with [hurdleNumber = 0] [
       set xcor 21
-      if count players-here > 0 [
-        set gameOver true
-      ]
+      check-player-colission
     ]
 
   ]
   if hurdletick mod 10 = 8 [
     ask hurdles with [hurdleNumber = 0] [
       set xcor 20
-      if count players-here > 0 [
-        set gameOver true
-      ]
+      check-player-colission
     ]
 
   ]
@@ -721,16 +689,12 @@ to move-hurdle-one-two
   if hurdletick mod 10 = 9 [
     ask hurdles with [hurdleNumber = 0] [
       set xcor 20
-      if count players-here > 0 [
-        set gameOver true
-      ]
+      check-player-colission
     ]
 
     ask hurdles with [hurdleNumber = 1] [
       set xcor 46
-      if count players-here > 0 [
-        set gameOver true
-      ]
+      check-player-colission
     ]
   ]
 
@@ -743,12 +707,8 @@ to move-player
     ifelse xcor < 65 and not gameOver [
       if  gameOver [ stop ]
       forward 0.25
-      if count hurdles-here > 0 [
-        set gameOver true
-      ]
-      if count coins-here > 0 [
-        set gotCoin true
-      ]
+      check-hurdle-colission
+      check-coin-colission
     ]
     [
       set gameOver true
@@ -767,12 +727,8 @@ to walk
   while [counter < 4] [
     ask players [
       forward 0.25
-      if count hurdles-here > 0 [
-        set gameOver true
-      ]
-      if count coins-here > 0 [
-        set gotCoin true
-      ]
+      check-hurdle-colission
+      check-coin-colission
     ]
     set counter counter + 1
     tick
@@ -790,12 +746,8 @@ to jump-regular
   repeat 3 [
     ask players [
       set ycor ycor + 1
-      if count hurdles-here > 0 [
-        set gameOver true
-      ]
-      if count coins-here > 0 [
-        set gotCoin true
-      ]
+      check-hurdle-colission
+      check-coin-colission
     ]
   ]
   while [counter < 16 and not gameOver ] [
@@ -818,12 +770,8 @@ to jump-long
   repeat 3 [
     ask players [
       set ycor ycor + 1
-      if count hurdles-here > 0 [
-        set gameOver true
-      ]
-      if count coins-here > 0 [
-        set gotCoin true
-      ]
+      check-hurdle-colission
+      check-coin-colission
     ]
   ]
   while [counter < 24 and not gameOver] [
@@ -847,12 +795,8 @@ to jump-high
   repeat 4 [
     ask players [
       set ycor ycor + 1
-      if count hurdles-here > 0 [
-        set gameOver true
-      ]
-      if count coins-here > 0 [
-        set gotCoin true
-      ]
+      check-hurdle-colission
+      check-coin-colission
     ]
   ]
   while [counter < 16 and not gameOver] [
@@ -874,9 +818,7 @@ to move-forward
   ask players [
     if xcor < 65 and not gameOver [
       forward 0.25
-      if count hurdles-here > 0 [
-        set gameOver true
-      ]
+      check-hurdle-colission
     ]
   ]
 end
@@ -885,15 +827,29 @@ end
 to fall-down
   ask players [
     set ycor 0
-      if count hurdles-here > 0 [
-        set gameOver true
-      ]
-      if count coins-here > 0 [
-        set gotCoin true
-      ]
+      check-hurdle-colission
+      check-coin-colission
   ]
   set hasJumped true
 
+end
+
+to check-hurdle-colission
+  if count hurdles-here > 0 [
+    set gameOver true
+  ]
+end
+
+to check-coin-colission
+  if count coins-here > 0 [
+    set gotCoin true
+  ]
+end
+
+to check-player-colission
+  if count players-here > 0 [
+    set gameOver true
+  ]
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
@@ -1044,7 +1000,7 @@ learningRate
 learningRate
 0.01
 1
-1
+0.96
 0.01
 1
 NIL
@@ -1102,7 +1058,7 @@ Iterations
 Iterations
 10
 10000
-110
+1610
 100
 1
 NIL
