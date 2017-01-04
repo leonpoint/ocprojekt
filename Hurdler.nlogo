@@ -6,6 +6,8 @@ breed [flags flag]
 breed [hurdles hurdle]
 breed [coins coin]
 
+hurdles-own[hurdleNumber]
+
 
 globals[Q-Matrix Relation-Matrix Reward-Matrix Q_Size Action_Size currentState nextState nextReward calculatedMax calculatedMaxIndex action iter iteration-percentile goalReached testRun hasJumped gotCoin randHurdle gameOver ]
 
@@ -19,30 +21,7 @@ globals[Q-Matrix Relation-Matrix Reward-Matrix Q_Size Action_Size currentState n
 to setup
   clear-all
 
-  set gameOver false
-
-  ;--- Q Matrix with height 66, Width 4
-  set Q-Matrix matrix:make-constant 66 4 0
-
-
-  set Q_Size 65
-
-  set Action_Size 4
-
-  set currentState 0
-
-  set nextState 0
-
-  set iter 0
-
-  set goalReached 0
-
-  set testRun false
-
-  set randHurdle -1
-
-  set hasJumped false
-
+  setup-variables
   setup-patches
   setup-hurdles
   setup-player
@@ -62,7 +41,7 @@ end
 
 to go
   move-player
-  move-hurdle-one
+  move-hurdle-one-two
   tick
   if gameOver [stop]
 end
@@ -329,6 +308,32 @@ end
 
 ;################################## setup-subprocedures ##################################
 
+to setup-variables
+
+  set gameOver false
+
+  ;--- Q Matrix with height 66, Width 4
+  set Q-Matrix matrix:make-constant 66 4 0
+
+
+  set Q_Size 65
+
+  set Action_Size 4
+
+  set currentState 0
+
+  set nextState 0
+
+  set iter 0
+
+  set goalReached 0
+
+  set testRun false
+
+  set randHurdle -1
+
+  set hasJumped false
+end
 
 to setup-patches
 
@@ -378,10 +383,15 @@ to setup-hurdles
 
   create-hurdles 16
 
+  ask hurdles [
+    set hurdleNumber -1
+  ]
+
   set-default-shape hurdles "square"
 
   ; this one moves
   ask hurdle 0 [
+    set hurdleNumber 0
     set xcor 20
     set ycor 0
     set size 1
@@ -389,6 +399,7 @@ to setup-hurdles
   ]
   ; this one moves (together with hurdle 0)
   ask hurdle 1 [
+    set hurdleNumber 0
     set xcor 20
     set ycor 1
     set color brown
@@ -414,21 +425,25 @@ to setup-hurdles
     set color brown
   ]
   ask hurdle 6 [
+    set hurdleNumber 1
     set xcor 45
     set ycor 0
     set color brown
   ]
   ask hurdle 7 [
+    set hurdleNumber 1
     set xcor 45
     set ycor 1
     set color brown
   ]
   ask hurdle 8 [
+    set hurdleNumber 1
     set xcor 45
     set ycor 2
     set color brown
   ]
   ask hurdle 9 [
+    set hurdleNumber 1
     set xcor 45
     set ycor 3
     set color brown
@@ -600,156 +615,119 @@ end
 ;################################## go-subprocedures ##################################
 
 
-to move-hurdle-one
+to move-hurdle-one-two
 
   let hurdletick ticks + randHurdle
 
   if hurdletick mod 10 = 0 [
-    ask hurdle 0 [
+    ask hurdles with [hurdleNumber = 0] [
       set xcor 20
       if count players-here > 0 [
         set gameOver true
       ]
     ]
-
-    ask hurdle 1 [
-      set xcor 20
+    ask hurdles with [hurdleNumber = 1] [
+      set xcor 45
       if count players-here > 0 [
         set gameOver true
       ]
     ]
   ]
   if hurdletick mod 10 = 1 [
-    ask hurdle 0 [
+    ask hurdles with [hurdleNumber = 0] [
       set xcor 21
       if count players-here > 0 [
         set gameOver true
       ]
     ]
 
-    ask hurdle 1 [
-      set xcor 21
-      if count players-here > 0 [
-        set gameOver true
-      ]
-    ]
   ]
   if hurdletick mod 10 = 2 [
-    ask hurdle 0 [
+    ask hurdles with [hurdleNumber = 0] [
       set xcor 22
       if count players-here > 0 [
         set gameOver true
       ]
     ]
 
-    ask hurdle 1 [
-      set xcor 22
-      if count players-here > 0 [
-        set gameOver true
-      ]
-    ]
   ]
   if hurdletick mod 10 = 3 [
-    ask hurdle 0 [
+    ask hurdles with [hurdleNumber = 0] [
       set xcor 23
       if count players-here > 0 [
         set gameOver true
       ]
     ]
 
-    ask hurdle 1 [
-      set xcor 23
+    ask hurdles with [hurdleNumber = 1] [
+      set xcor 46
       if count players-here > 0 [
         set gameOver true
       ]
     ]
   ]
   if hurdletick mod 10 = 4 [
-    ask hurdle 0 [
+    ask hurdles with [hurdleNumber = 0] [
       set xcor 24
       if count players-here > 0 [
         set gameOver true
       ]
     ]
 
-    ask hurdle 1 [
-      set xcor 24
-      if count players-here > 0 [
-        set gameOver true
-      ]
-    ]
   ]
   if hurdletick mod 10 = 5 [
-    ask hurdle 0 [
+    ask hurdles with [hurdleNumber = 0] [
       set xcor 23
       if count players-here > 0 [
         set gameOver true
       ]
     ]
 
-    ask hurdle 1 [
-      set xcor 23
-      if count players-here > 0 [
-        set gameOver true
-      ]
-    ]
   ]
   if hurdletick mod 10 = 6 [
-    ask hurdle 0 [
+    ask hurdles with [hurdleNumber = 0] [
       set xcor 22
       if count players-here > 0 [
         set gameOver true
       ]
     ]
 
-    ask hurdle 1 [
-      set xcor 22
+    ask hurdles with [hurdleNumber = 1] [
+      set xcor 47
       if count players-here > 0 [
         set gameOver true
       ]
     ]
   ]
   if hurdletick mod 10 = 7 [
-    ask hurdle 0 [
+    ask hurdles with [hurdleNumber = 0] [
       set xcor 21
       if count players-here > 0 [
         set gameOver true
       ]
     ]
 
-    ask hurdle 1 [
-      set xcor 21
-      if count players-here > 0 [
-        set gameOver true
-      ]
-    ]
   ]
   if hurdletick mod 10 = 8 [
-    ask hurdle 0 [
+    ask hurdles with [hurdleNumber = 0] [
       set xcor 20
       if count players-here > 0 [
         set gameOver true
       ]
     ]
 
-    ask hurdle 1 [
-      set xcor 20
-      if count players-here > 0 [
-        set gameOver true
-      ]
-    ]
   ]
 
   if hurdletick mod 10 = 9 [
-    ask hurdle 0 [
+    ask hurdles with [hurdleNumber = 0] [
       set xcor 20
       if count players-here > 0 [
         set gameOver true
       ]
     ]
 
-    ask hurdle 1 [
-      set xcor 20
+    ask hurdles with [hurdleNumber = 1] [
+      set xcor 46
       if count players-here > 0 [
         set gameOver true
       ]
@@ -798,7 +776,7 @@ to walk
     ]
     set counter counter + 1
     tick
-    move-hurdle-one
+    move-hurdle-one-two
   ]
   if not testRun [
     calculate-q
@@ -826,7 +804,7 @@ to jump-regular
     ]
     set counter counter + 1
     tick
-    move-hurdle-one
+    move-hurdle-one-two
   ]
   fall-down
   if not testRun [
@@ -854,7 +832,7 @@ to jump-long
     ]
     set counter counter + 1
     tick
-    move-hurdle-one
+    move-hurdle-one-two
   ]
   fall-down
   if not testRun [
@@ -883,7 +861,7 @@ to jump-high
     ]
     set counter counter + 1
     tick
-    move-hurdle-one
+    move-hurdle-one-two
   ]
   fall-down
   if not testRun [
@@ -939,11 +917,11 @@ GRAPHICS-WINDOW
 70
 -3
 19
-0
-0
+1
+1
 1
 ticks
-60.0
+30.0
 
 BUTTON
 206
@@ -1066,7 +1044,7 @@ learningRate
 learningRate
 0.01
 1
-0.44
+1
 0.01
 1
 NIL
@@ -1080,8 +1058,8 @@ SLIDER
 discountFactor
 discountFactor
 0
-1
-0.36
+0.99
+0.53
 0.01
 1
 NIL
@@ -1122,10 +1100,10 @@ SLIDER
 115
 Iterations
 Iterations
-1000
-20000
-1000
-1000
+10
+10000
+110
+100
 1
 NIL
 HORIZONTAL
