@@ -138,6 +138,12 @@ to chooseAction
     let temp matrix:get Q-Matrix currentState j
     if temp = maximum [
       set actionlist lput j actionlist
+
+      ; walking only moves player by one unit, thus making it less likely than any other action
+      ; adding it another time makes it move even
+      if temp = 0 [
+        set actionlist lput 0 actionlist
+      ]
     ]
     set j j + 1
   ]
@@ -1058,7 +1064,7 @@ learningRate
 learningRate
 0.01
 1
-0.36
+0.44
 0.01
 1
 NIL
@@ -1073,7 +1079,7 @@ discountFactor
 discountFactor
 0
 1
-0.23
+0.36
 0.01
 1
 NIL
@@ -1086,7 +1092,7 @@ BUTTON
 58
 Test
 test
-T
+NIL
 1
 T
 OBSERVER
@@ -1114,10 +1120,10 @@ NIL
 1
 
 MONITOR
-947
-135
-1096
-180
+1024
+130
+1156
+175
 Percentage of Iterations
 iteration-percentile
 1
@@ -1132,21 +1138,32 @@ SLIDER
 Iterations
 Iterations
 1000
-100000
-2000
+20000
+1000
 1000
 1
 NIL
 HORIZONTAL
 
 MONITOR
-1122
-135
-1211
-180
+1166
+130
+1241
+175
 Goal Reached
 goal-reached
 1
+1
+11
+
+MONITOR
+947
+130
+1014
+175
+Iterations
+iter
+0
 1
 11
 
