@@ -6,6 +6,8 @@ breed [flags flag]
 breed [hurdles hurdle]
 breed [coins coin]
 breed [reapers reaper]
+breed [suns sun]
+breed [flowers flower]
 
 coins-own[coinNumber]
 hurdles-own[hurdleNumber]
@@ -29,6 +31,7 @@ to setup
   setup-player
   setup-flag
   setup-coins
+  setup-beautify
 
   setup-Relation-Matrix
 
@@ -332,14 +335,19 @@ end
 to setup-patches
 
   ask patches [
-    set pcolor grey]
+    set pcolor 96]
 
   ;chess-like grid to improve readability
-  ask patches with [(pxcor + pycor) mod 2 = 0] [set pcolor 6]
+  ;ask patches with [(pxcor + pycor) mod 2 = 0] [set pcolor 6]
 
-  ask patches with [pycor = -1] [
+  ask patches with [pycor <= -1] [
     set pcolor green
   ]
+
+  ask patches with [pycor > 11] [
+    set pcolor 96
+  ]
+
 
 end
 
@@ -471,6 +479,28 @@ to setup-hurdles
   ask hurdle 15 [
     set xcor 38
     set ycor 4
+
+  ]
+end
+
+to setup-beautify
+  create-suns 1
+  set-default-shape suns "sun"
+  ask suns [
+    set xcor 65
+    set ycor 16
+    set size 4
+    set color yellow
+  ]
+
+  create-flowers 1
+  set-default-shape flowers "flower"
+  let colorrandom random 10
+  ask flowers [
+    set xcor 52
+    set ycor 1
+    set size 3
+    set color 33 + colorrandom * 10
 
   ]
 end
