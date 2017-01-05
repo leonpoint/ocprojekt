@@ -5,7 +5,9 @@ breed [blocks block]
 breed [flags flag]
 breed [hurdles hurdle]
 breed [coins coin]
+breed [reapers reaper]
 
+coins-own[coinNumber]
 hurdles-own[hurdleNumber]
 
 
@@ -32,8 +34,6 @@ to setup
 
   setup-Reward-Matrix
 
-  ;chess-like grid to improve readability
-  ask patches with [(pxcor + pycor) mod 2 = 0] [set pcolor 6]
 
   reset-ticks
 end
@@ -94,7 +94,9 @@ to episode
   ]
 
   ask players [
+    pen-up
     set xcor 0
+    pen-down
   ]
   reset-ticks
 
@@ -331,6 +333,10 @@ to setup-patches
 
   ask patches [
     set pcolor grey]
+
+  ;chess-like grid to improve readability
+  ask patches with [(pxcor + pycor) mod 2 = 0] [set pcolor 6]
+
   ask patches with [pycor = -1] [
     set pcolor green
   ]
@@ -346,8 +352,10 @@ to setup-player
 
   ;-- Player starts on x=0, y=0
   ask players [
+    pen-up
     set xcor 0
     set ycor 0
+    pen-down
     set size 2
     set heading 90
     set color black
@@ -377,103 +385,99 @@ to setup-hurdles
 
   ask hurdles [
     set hurdleNumber -1
+    set color red
   ]
 
-  set-default-shape hurdles "square"
+  set-default-shape hurdles "tile brick"
 
   ; this one moves
   ask hurdle 0 [
     set hurdleNumber 0
     set xcor 20
     set ycor 0
-    set size 1
-    set color brown
   ]
   ; this one moves (together with hurdle 0)
   ask hurdle 1 [
     set hurdleNumber 0
     set xcor 20
     set ycor 1
-    set color brown
   ]
   ask hurdle 2 [
     set xcor 30
     set ycor 0
-    set color brown
   ]
   ask hurdle 3 [
     set xcor 31
     set ycor 0
-    set color brown
   ]
   ask hurdle 4 [
     set xcor 32
     set ycor 0
-    set color brown
   ]
   ask hurdle 5 [
     set xcor 33
     set ycor 0
-    set color brown
+
   ]
   ask hurdle 6 [
     set hurdleNumber 1
     set xcor 45
     set ycor 0
-    set color brown
+
   ]
   ask hurdle 7 [
     set hurdleNumber 1
     set xcor 45
     set ycor 1
-    set color brown
+
   ]
   ask hurdle 8 [
     set hurdleNumber 1
     set xcor 45
     set ycor 2
-    set color brown
+
   ]
   ask hurdle 9 [
     set hurdleNumber 1
     set xcor 45
     set ycor 3
-    set color brown
+
   ]
   ask hurdle 10 [
     set xcor 20
     set ycor 4
-    set color brown
+
   ]
   ask hurdle 11 [
     set xcor 38
     set ycor 2
-    set color brown
+
   ]
   ask hurdle 12 [
     set xcor 39
     set ycor 2
-    set color brown
+
   ]
   ask hurdle 13 [
     set xcor 40
     set ycor 2
-    set color brown
+
   ]
   ask hurdle 14 [
     set xcor 38
     set ycor 3
-    set color brown
+
   ]
   ask hurdle 15 [
     set xcor 38
     set ycor 4
-    set color brown
+
   ]
 end
 
 
 to setup-coins
+
   create-coins 3
 
   set-default-shape coins "circle"
@@ -494,6 +498,7 @@ to setup-coins
   ask coin 20 [
     set xcor 26
     set ycor 3
+    set coinNumber 1
   ]
 
 end
@@ -908,7 +913,7 @@ T
 T
 OBSERVER
 NIL
-NIL
+T
 NIL
 NIL
 0
@@ -1058,7 +1063,7 @@ Iterations
 Iterations
 10
 10000
-1610
+910
 100
 1
 NIL
@@ -1169,6 +1174,20 @@ Circle -16777216 true false 135 90 30
 Line -16777216 false 150 105 195 60
 Line -16777216 false 150 105 105 60
 
+cactus
+false
+0
+Polygon -7500403 true true 130 300 124 206 110 207 94 201 81 183 75 171 74 95 79 79 88 74 97 79 100 95 101 151 104 169 115 180 126 169 129 31 132 19 145 16 153 20 158 32 162 142 166 149 177 149 185 137 185 119 189 108 199 103 212 108 215 121 215 144 210 165 196 177 176 181 164 182 159 302
+Line -16777216 false 142 32 146 143
+Line -16777216 false 148 179 143 300
+Line -16777216 false 123 191 114 197
+Line -16777216 false 113 199 96 188
+Line -16777216 false 95 188 84 168
+Line -16777216 false 83 168 82 103
+Line -16777216 false 201 147 202 123
+Line -16777216 false 190 162 199 148
+Line -16777216 false 174 164 189 163
+
 car
 false
 0
@@ -1231,6 +1250,13 @@ Circle -16777216 true false 60 75 60
 Circle -16777216 true false 180 75 60
 Polygon -16777216 true false 150 168 90 184 62 210 47 232 67 244 90 220 109 205 150 198 192 205 210 220 227 242 251 229 236 206 212 183
 
+fire
+false
+0
+Polygon -7500403 true true 151 286 134 282 103 282 59 248 40 210 32 157 37 108 68 146 71 109 83 72 111 27 127 55 148 11 167 41 180 112 195 57 217 91 226 126 227 203 256 156 256 201 238 263 213 278 183 281
+Polygon -955883 true false 126 284 91 251 85 212 91 168 103 132 118 153 125 181 135 141 151 96 185 161 195 203 193 253 164 286
+Polygon -2674135 true false 155 284 172 268 172 243 162 224 148 201 130 233 131 260 135 282
+
 fish
 false
 0
@@ -1264,6 +1290,15 @@ Circle -7500403 true true 96 51 108
 Circle -16777216 true false 113 68 74
 Polygon -10899396 true false 189 233 219 188 249 173 279 188 234 218
 Polygon -10899396 true false 180 255 150 210 105 210 75 240 135 240
+
+flower budding
+false
+0
+Polygon -7500403 true true 135 120 165 165 180 210 180 240 150 300 165 300 195 240 195 195 165 135
+Polygon -7500403 true true 189 233 219 188 249 173 279 188 234 218
+Polygon -7500403 true true 180 255 150 210 105 210 75 240 135 240
+Polygon -7500403 true true 180 150 180 120 165 97 135 84 128 121 147 148 165 165
+Polygon -7500403 true true 170 155 131 163 175 167 196 136
 
 house
 false
@@ -1347,6 +1382,19 @@ false
 0
 Polygon -7500403 true true 151 1 185 108 298 108 207 175 242 282 151 216 59 282 94 175 3 108 116 108
 
+sun
+false
+0
+Circle -7500403 true true 75 75 150
+Polygon -7500403 true true 300 150 240 120 240 180
+Polygon -7500403 true true 150 0 120 60 180 60
+Polygon -7500403 true true 150 300 120 240 180 240
+Polygon -7500403 true true 0 150 60 120 60 180
+Polygon -7500403 true true 60 195 105 240 45 255
+Polygon -7500403 true true 60 105 105 60 45 45
+Polygon -7500403 true true 195 60 240 105 255 45
+Polygon -7500403 true true 240 195 195 240 255 255
+
 target
 false
 0
@@ -1355,6 +1403,21 @@ Circle -16777216 true false 30 30 240
 Circle -7500403 true true 60 60 180
 Circle -16777216 true false 90 90 120
 Circle -7500403 true true 120 120 60
+
+tile brick
+false
+0
+Rectangle -1 true false 0 0 300 300
+Rectangle -7500403 true true 15 225 150 285
+Rectangle -7500403 true true 165 225 300 285
+Rectangle -7500403 true true 75 150 210 210
+Rectangle -7500403 true true 0 150 60 210
+Rectangle -7500403 true true 225 150 300 210
+Rectangle -7500403 true true 165 75 300 135
+Rectangle -7500403 true true 15 75 150 135
+Rectangle -7500403 true true 0 0 60 60
+Rectangle -7500403 true true 225 0 300 60
+Rectangle -7500403 true true 75 0 210 60
 
 tree
 false
