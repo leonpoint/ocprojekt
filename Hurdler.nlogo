@@ -5,7 +5,7 @@ breed [blocks block]
 breed [flags flag]
 breed [hurdles hurdle]
 breed [coins coin]
-breed [reapers reaper]
+breed [fires fire]
 breed [suns sun]
 breed [flowers flower]
 
@@ -13,7 +13,7 @@ coins-own[coinNumber]
 hurdles-own[hurdleNumber]
 
 
-globals[Q-Matrix Relation-Matrix Reward-Matrix Q_Size Action_Size currentState nextState nextReward calculatedMax calculatedMaxIndex action iter iteration-percentile goalReached testRun hasJumped gotCoin randHurdle gameOver ]
+globals[Q-Matrix Relation-Matrix Reward-Matrix Q_Size Action_Size currentState nextState nextReward calculatedMax calculatedMaxIndex action iter iteration-percentile goalReached testRun hasJumped gotCoin hitFire randHurdle gameOver ]
 
 ; Actions
 ; walk, regular, long, high
@@ -32,6 +32,7 @@ to setup
   setup-flag
   setup-coins
   setup-beautify
+  setup-fire
 
   setup-Relation-Matrix
 
@@ -52,12 +53,24 @@ end
 
 to train
   episode
+
+  ifelse iter mod 3 = 0 [
+    show-fire
+  ]
+  [
+    hide-fire
+  ]
+
   set iter iter + 1
 
   set iteration-percentile 100 * iter / Iterations
-  if iter = Iterations [stop]
+  if iter = Iterations [
+    print matrix:pretty-print-text Q-Matrix
+    stop
 
-  ;print matrix:pretty-print-text Q-Matrix
+    ]
+
+
 end
 
 
@@ -177,6 +190,10 @@ to calculate-q
   if gameOver = false and gotCoin = true [
     set nextReward 10
 
+  ]
+
+  if gameOver = true and hitFire = true [
+    set nextReward -30
   ]
 
 
@@ -505,6 +522,18 @@ to setup-beautify
   ]
 end
 
+to setup-fire
+  create-fires 1
+  set-default-shape fires "fire"
+  ask fires [
+    set size 2
+    set xcor 58
+    set color red
+  ]
+  hide-fire
+
+end
+
 
 to setup-coins
 
@@ -735,6 +764,21 @@ to move-hurdle-one-two
 
 end
 
+to show-fire
+  ask fires [
+    set hidden? false
+    set ycor 0
+  ]
+end
+
+to hide-fire
+  ask fires [
+    set hidden? true
+    set ycor 10
+  ]
+
+end
+
 
 to move-player
   ask players [
@@ -764,6 +808,7 @@ to walk
       forward 0.25
       check-hurdle-colission
       check-coin-colission
+      check-fire-colission
     ]
     set counter counter + 1
     tick
@@ -783,6 +828,7 @@ to jump-regular
       set ycor ycor + 1
       check-hurdle-colission
       check-coin-colission
+      check-fire-colission
     ]
   ]
   while [counter < 16 and not gameOver ] [
@@ -807,6 +853,7 @@ to jump-long
       set ycor ycor + 1
       check-hurdle-colission
       check-coin-colission
+      check-fire-colission
     ]
   ]
   while [counter < 24 and not gameOver] [
@@ -832,6 +879,7 @@ to jump-high
       set ycor ycor + 1
       check-hurdle-colission
       check-coin-colission
+      check-fire-colission
     ]
   ]
   while [counter < 16 and not gameOver] [
@@ -864,6 +912,7 @@ to fall-down
     set ycor 0
       check-hurdle-colission
       check-coin-colission
+      check-fire-colission
   ]
   set hasJumped true
 
@@ -883,6 +932,13 @@ end
 
 to check-player-colission
   if count players-here > 0 [
+    set gameOver true
+  ]
+end
+
+to check-fire-colission
+  if count fires-here > 0 [
+    set hitFire true
     set gameOver true
   ]
 end
@@ -915,10 +971,10 @@ ticks
 30.0
 
 BUTTON
-206
-372
-291
-405
+519
+350
+629
+444
 Restart
 setup
 NIL
@@ -932,10 +988,10 @@ NIL
 1
 
 BUTTON
-307
-372
-383
-405
+248
+390
+338
+430
 Start
 go
 T
@@ -949,10 +1005,10 @@ NIL
 0
 
 BUTTON
-469
-336
-561
-369
+203
+488
+295
+521
 Jump
 jump-regular
 NIL
@@ -966,10 +1022,10 @@ NIL
 0
 
 BUTTON
-566
-336
-658
-369
+300
+488
+392
+521
 Long Jump
 jump-long
 NIL
@@ -983,10 +1039,10 @@ NIL
 0
 
 BUTTON
-512
-298
-604
-331
+246
+450
+338
+483
 High Jump
 jump-high
 NIL
@@ -1010,10 +1066,10 @@ Press [R] to Restart the Round\nPress [Space] to Start the Game\nPress the label
 0
 
 BUTTON
-953
-25
-1016
-58
+728
+308
+791
+341
 Train
 train
 T
@@ -1027,40 +1083,40 @@ NIL
 1
 
 SLIDER
-948
-191
-1120
-224
+723
+474
+895
+507
 learningRate
 learningRate
 0.01
 1
-0.96
+0.55
 0.01
 1
 NIL
 HORIZONTAL
 
 SLIDER
-949
-248
-1121
-281
+724
+531
+896
+564
 discountFactor
 discountFactor
 0
 0.99
-0.53
+0.99
 0.01
 1
 NIL
 HORIZONTAL
 
 BUTTON
-1025
-25
-1088
-58
+800
+308
+863
+341
 Test
 test
 NIL
@@ -1074,10 +1130,10 @@ NIL
 1
 
 MONITOR
-1024
-130
-1191
-179
+799
+413
+966
+462
 Percentage of Iterations
 iteration-percentile
 1
@@ -1085,25 +1141,25 @@ iteration-percentile
 12
 
 SLIDER
-946
-82
-1095
-115
+721
+365
+965
+398
 Iterations
 Iterations
-10
-10000
-910
+0
+2000
+1400
 100
 1
 NIL
 HORIZONTAL
 
 MONITOR
-1206
-130
-1293
-179
+724
+574
+811
+623
 Goal Reached
 goalReached
 1
@@ -1111,10 +1167,10 @@ goalReached
 12
 
 MONITOR
-947
-130
-1020
-179
+722
+413
+795
+462
 Iterations
 iter
 0
