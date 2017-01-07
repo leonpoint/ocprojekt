@@ -65,9 +65,7 @@ to train
 
   set iteration-percentile 100 * iter / Iterations
   if iter = Iterations [
-    print matrix:pretty-print-text Q-Matrix
     stop
-
     ]
 
 
@@ -209,32 +207,32 @@ to calculate-q
 
 
 
-  ; normalize matrix
-  let i 0
-  let j 0
-  let maxValue -10000
-  while [i < 65] [
-    while [j < 4] [
-      if matrix:get Q-Matrix i j > maxValue [
-        set maxValue matrix:get Q-Matrix i j
-      ]
-      set j j + 1
-    ]
-    set i i + 1
-  ]
-
-  ; normalize matrix
-  set i 0
-  set j 0
-  while [i < 65] [
-    while [j < 4] [
-      if maxValue > 0 [
-        matrix:set Q-Matrix i j (matrix:get Q-Matrix i j) / maxValue
-      ]
-      set j j + 1
-    ]
-    set i i + 1
-  ]
+;  ; normalize matrix
+;  let i 0
+;  let j 0
+;  let maxValue -10000
+;  while [i < 65] [
+;    while [j < 4] [
+;      if matrix:get Q-Matrix i j > maxValue [
+;        set maxValue matrix:get Q-Matrix i j
+;      ]
+;      set j j + 1
+;    ]
+;    set i i + 1
+;  ]
+;
+;  ; normalize matrix
+;  set i 0
+;  set j 0
+;  while [i < 65] [
+;    while [j < 4] [
+;      if maxValue > 0 [
+;        matrix:set Q-Matrix i j (matrix:get Q-Matrix i j) / maxValue
+;      ]
+;      set j j + 1
+;    ]
+;    set i i + 1
+;  ]
 
 
 end
@@ -258,6 +256,7 @@ end
 to test
   set testRun true
   clear-drawing
+  set randHurdle random 7
 
   set currentState 0
   ask players [
@@ -942,6 +941,11 @@ to check-fire-colission
     set gameOver true
   ]
 end
+
+to print-Q-Matrix
+  print matrix:pretty-print-text Q-Matrix
+
+end
 @#$#@#$#@
 GRAPHICS-WINDOW
 210
@@ -971,10 +975,10 @@ ticks
 30.0
 
 BUTTON
-519
-350
-629
-444
+465
+412
+638
+506
 Restart
 setup
 NIL
@@ -988,10 +992,10 @@ NIL
 1
 
 BUTTON
-248
-390
-338
-430
+245
+483
+335
+523
 Start
 go
 T
@@ -1005,10 +1009,10 @@ NIL
 0
 
 BUTTON
-203
-488
-295
-521
+200
+575
+292
+608
 Jump
 jump-regular
 NIL
@@ -1022,10 +1026,10 @@ NIL
 0
 
 BUTTON
-300
-488
-392
-521
+297
+575
+389
+608
 Long Jump
 jump-long
 NIL
@@ -1039,10 +1043,10 @@ NIL
 0
 
 BUTTON
-246
-450
-338
-483
+243
+537
+335
+570
 High Jump
 jump-high
 NIL
@@ -1056,20 +1060,20 @@ NIL
 0
 
 TEXTBOX
-210
-295
-397
-370
-Press [R] to Restart the Round\nPress [Space] to Start the Game\nPress the labeled keys for a Jump\n
+201
+384
+388
+474
+Click anywhere on the white Space to focus Buttons\n\nPress [R] to Restart the Round\nPress [T] to Start the Game\nPress the labeled keys for a Jump\n
 12
 0.0
 0
 
 BUTTON
-728
-308
-791
-341
+738
+384
+803
+419
 Train
 train
 T
@@ -1083,40 +1087,40 @@ NIL
 1
 
 SLIDER
-723
-474
-895
-507
+724
+478
+896
+511
 learningRate
 learningRate
 0.01
 1
-0.55
+0.85
 0.01
 1
 NIL
 HORIZONTAL
 
 SLIDER
-724
-531
-896
-564
+725
+535
+897
+568
 discountFactor
 discountFactor
 0
 0.99
-0.99
+0.83
 0.01
 1
 NIL
 HORIZONTAL
 
 BUTTON
-800
-308
-863
-341
+812
+384
+877
+419
 Test
 test
 NIL
@@ -1130,89 +1134,139 @@ NIL
 1
 
 MONITOR
-799
-413
-966
-462
-Percentage of Iterations
+814
+576
+885
+625
+% Done
 iteration-percentile
 1
 1
 12
 
 SLIDER
-721
-365
-965
-398
+703
+436
+927
+469
 Iterations
 Iterations
 0
-2000
-1400
+5000
+5000
 100
 1
 NIL
 HORIZONTAL
 
 MONITOR
-724
-574
-811
-623
-Goal Reached
+756
+629
+869
+678
+# Goal Reached
 goalReached
 1
 1
 12
 
 MONITOR
-722
-413
-795
-462
+737
+576
+810
+625
 Iterations
 iter
 0
 1
 12
 
+TEXTBOX
+250
+351
+339
+373
+For Playing
+18
+0.0
+1
+
+TEXTBOX
+749
+345
+899
+367
+For Q-Learning
+18
+0.0
+1
+
+TEXTBOX
+692
+240
+824
+262
+Hint: the flower doesn't actually do anything
+9
+0.0
+1
+
+BUTTON
+758
+685
+867
+718
+Print Q-Matrix
+print-Q-Matrix
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
 @#$#@#$#@
-## WHAT IS IT?
+## What is being shown?
 
-(a general understanding of what the model is trying to show or explain)
+A recreation of the Game "Hurdler". The Hurdler autonomously trains to beat the level using Q-Learning.
 
-## HOW IT WORKS
+## How it works:
+At each Corrdinate the Hurdler can choose between walking or 3 different types of jumps in order to collect coins or avoid obstacles. The goal is to reach the end of the level (as displayed by the flag).
 
-(what rules the agents use to create the overall behavior of the model)
+## How to use it:
 
-## HOW TO USE IT
+**For Q-Learning**
 
-(how to use the model, including a description of each of the items in the Interface tab)
+  1. We recommend tick-based updates for visualization. If you want to speed up the process untick *view updates* or increase the update speed.
+  2. Adjust the parameters to your liking. You may change the number of iterations, the learning rate of the Hurdler, or the discount factor
+  3. Press the **Restart**-Button. This clears all learning progress and sets up the environment.
+  4. Press the **Train**-Button. You may at any point click the button again to pause training and display the current progress by pressing the **Test**-Button.
+  5. After training is completed, make sure to enable *view updates* and hit **Test** to see the solution that the agent has learned.
+  6. Optionally, view the Matrix that shows the learned values of the algorithm by pressing the **show Q-Matrix**-Button.
 
-## THINGS TO NOTICE
+**For Playing on your own**
+  1. Click anywhere on the white Space around the playing field to enable button focus.
 
-(suggested things for the user to notice while running the model)
+  2. Press [**R**] to Restart the Round.
+  3. Press [**T**] to Start the Game.
+  4. Press the labeled keys for a Jump.
 
-## THINGS TO TRY
 
-(suggested things for the user to try to do (move sliders, switches, etc.) with the model)
 
-## EXTENDING THE MODEL
 
-(suggested things to add or change in the Code tab to make the model more complicated, detailed, accurate, etc.)
+## Things to try
 
-## NETLOGO FEATURES
+  * Try setting the discount factor to its maximum value. The Hurdler will prefer dying over finishing the level if he can grab a coin!
+  * Try a very low number of iterations. Tune the parametes so the Hurdler makes the biggest progress!
 
-(interesting or unusual features of NetLogo that the model uses, particularly in the Code tab; or where workarounds were needed for missing features)
 
-## RELATED MODELS
 
-(models in the NetLogo Models Library and elsewhere which are of related interest)
+## Credits
 
-## CREDITS AND REFERENCES
-
-(a reference to the model's URL on the web if it has one, as well as any other necessary credits, citations, and links)
+© *Leon Wöhrl and Alexander Wagner*
 @#$#@#$#@
 default
 true
