@@ -13,7 +13,7 @@ coins-own[coinNumber]
 hurdles-own[hurdleNumber]
 
 
-globals[Q-Matrix Relation-Matrix Reward-Matrix Q_Size Action_Size currentState nextState nextReward calculatedMax calculatedMaxIndex action iter iteration-percentile goalReached testRun hasJumped gotCoin hitFire randHurdle gameOver ]
+globals[Q-Matrix Relation-Matrix Reward-Matrix Q_Size Action_Size currentState nextState nextReward calculatedMax calculatedMaxIndex action iter iteration-percentile goalReached testRun hasJumped gotCoin hitFire randHurdle gameOver distanceTraveled]
 
 ; Actions
 ; walk, regular, long, high
@@ -88,6 +88,7 @@ to episode
     ask players [
       pen-down
     ]
+
     chooseAction
 
     if action = 0 [
@@ -107,7 +108,13 @@ to episode
     ;calculate-q
   ]
 
+
+
   ask players [
+
+    ;for plotting
+    set distanceTraveled xcor
+
     pen-up
     set xcor 0
     pen-down
@@ -186,7 +193,7 @@ to calculate-q
     set nextReward 100
   ]
   if gameOver = false and gotCoin = true [
-    set nextReward 10
+    set nextReward 5
 
   ]
 
@@ -295,7 +302,10 @@ to test
       set i i + 1
     ]
 
+
+
     set calculatedMaxIndex move
+
 
     if calculatedMaxIndex = 0 [
       walk
@@ -309,6 +319,7 @@ to test
     if calculatedMaxIndex = 3 [
       jump-high
     ]
+
     set currentState matrix:get Relation-Matrix currentState calculatedMaxIndex
   ]
 
@@ -948,13 +959,13 @@ to print-Q-Matrix
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
-210
-10
-930
-271
+238
+29
+1075
+328
 -1
 -1
-10.0
+11.6522
 1
 10
 1
@@ -1070,9 +1081,9 @@ Click anywhere on the white Space to focus Buttons\n\nPress [R] to Restart the R
 0
 
 BUTTON
-738
+701
 384
-803
+766
 419
 Train
 train
@@ -1087,39 +1098,39 @@ NIL
 1
 
 SLIDER
-724
+687
 478
-896
+859
 511
 learningRate
 learningRate
 0.01
 1
-0.85
+1
 0.01
 1
 NIL
 HORIZONTAL
 
 SLIDER
-725
+688
 535
-897
+860
 568
 discountFactor
 discountFactor
 0
 0.99
-0.83
+0.42
 0.01
 1
 NIL
 HORIZONTAL
 
 BUTTON
-812
+775
 384
-877
+840
 419
 Test
 test
@@ -1134,9 +1145,9 @@ NIL
 1
 
 MONITOR
-814
+777
 576
-885
+848
 625
 % Done
 iteration-percentile
@@ -1145,24 +1156,24 @@ iteration-percentile
 12
 
 SLIDER
-703
+666
 436
-927
+890
 469
 Iterations
 Iterations
 0
 5000
-5000
+3000
 100
 1
 NIL
 HORIZONTAL
 
 MONITOR
-756
+719
 629
-869
+832
 678
 # Goal Reached
 goalReached
@@ -1171,9 +1182,9 @@ goalReached
 12
 
 MONITOR
-737
+700
 576
-810
+773
 625
 Iterations
 iter
@@ -1192,29 +1203,19 @@ For Playing
 1
 
 TEXTBOX
-749
+712
 345
-899
+862
 367
 For Q-Learning
 18
 0.0
 1
 
-TEXTBOX
-692
-240
-824
-262
-Hint: the flower doesn't actually do anything
-9
-0.0
-1
-
 BUTTON
-758
+721
 685
-867
+830
 718
 Print Q-Matrix
 print-Q-Matrix
@@ -1227,6 +1228,24 @@ NIL
 NIL
 NIL
 1
+
+PLOT
+869
+479
+1069
+629
+Score
+Iterations
+Distance
+0.0
+10.0
+0.0
+65.0
+true
+false
+"" ""
+PENS
+"default" 1.0 0 -16777216 true "" "if gameOver [plot distanceTraveled]"
 
 @#$#@#$#@
 ## What is being shown?
