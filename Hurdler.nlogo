@@ -182,23 +182,30 @@ to calculate-q
     set goalReached goalReached + 1
   ]
 
-  ; nothing happened
-  set nextReward 0
+  ; nothing happened. give reward "1" to promote reaching a longer distance
+  set nextReward 1
+
   ; player died, negative reward
   if gameOver = true and currentPos < 64 [
-    set nextReward -10
+    set nextReward -100
+    if gotCoin = true [
+      set nextReward nextReward + coin-reward
+      set gotCoin false
+    ]
   ]
   ; player won, positive reward
   if gameOver = true and currentPos >= 64 [
     set nextReward 100
+    set gotCoin false
   ]
   if gameOver = false and gotCoin = true [
-    set nextReward 5
+    set nextReward coin-reward
 
   ]
 
   if gameOver = true and hitFire = true [
-    set nextReward -30
+    set nextReward -100
+    set hitFire false
   ]
 
 
@@ -798,6 +805,7 @@ to move-player
       forward 0.25
       check-hurdle-colission
       check-coin-colission
+      check-fire-colission
     ]
     [
       set gameOver true
@@ -912,6 +920,8 @@ to move-forward
     if xcor < 65 and not gameOver [
       forward 0.25
       check-hurdle-colission
+      check-coin-colission
+      check-fire-colission
     ]
   ]
 end
@@ -1106,7 +1116,7 @@ learningRate
 learningRate
 0.01
 1
-1
+0.53
 0.01
 1
 NIL
@@ -1164,7 +1174,7 @@ Iterations
 Iterations
 0
 5000
-3000
+3100
 100
 1
 NIL
@@ -1246,6 +1256,17 @@ false
 "" ""
 PENS
 "default" 1.0 0 -16777216 true "" "if gameOver [plot distanceTraveled]"
+
+INPUTBOX
+869
+366
+1024
+426
+coin-reward
+10
+1
+0
+Number
 
 @#$#@#$#@
 ## What is being shown?
