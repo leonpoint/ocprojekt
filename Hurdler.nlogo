@@ -34,6 +34,8 @@ to setup
   setup-beautify
   setup-fire
 
+
+
   setup-Relation-Matrix
 
   setup-Reward-Matrix
@@ -54,7 +56,7 @@ end
 to train
   episode
 
-  ifelse iter mod 3 = 0 [
+  ifelse randHurdle mod 2 = 0 [
     show-fire
   ]
   [
@@ -188,6 +190,7 @@ to calculate-q
   ; player died, negative reward
   if gameOver = true and currentPos < 64 [
     set nextReward -100
+    set hasjumped false
     if gotCoin = true [
       set nextReward nextReward + coin-reward
       set gotCoin false
@@ -197,15 +200,18 @@ to calculate-q
   if gameOver = true and currentPos >= 64 [
     set nextReward 100
     set gotCoin false
+    set hasJumped false
   ]
   if gameOver = false and gotCoin = true [
     set nextReward coin-reward
+    set gotCoin false
 
   ]
 
   if gameOver = true and hitFire = true [
     set nextReward -100
     set hitFire false
+    set hasjumped false
   ]
 
 
@@ -269,6 +275,10 @@ end
 
 to test
   set testRun true
+  hide-fire
+  if goalReached mod 3 = 0 [
+    show-fire
+  ]
   clear-drawing
   set randHurdle random 7
 
@@ -515,6 +525,14 @@ to setup-hurdles
     set ycor 4
 
   ]
+
+
+  if level-variation [
+    ask hurdle 10 [
+      set xcor 4
+      set ycor 0
+      ]
+  ]
 end
 
 to setup-beautify
@@ -578,6 +596,11 @@ to setup-coins
   ]
 
 end
+
+
+
+
+
 
 
 to setup-Relation-Matrix
@@ -695,11 +718,9 @@ to move-hurdle-one-two
   if hurdletick mod 10 = 0 [
     ask hurdles with [hurdleNumber = 0] [
       set xcor 20
-      check-player-colission
     ]
     ask hurdles with [hurdleNumber = 1] [
       set xcor 45
-      check-player-colission
     ]
   ]
   if hurdletick mod 10 = 1 [
@@ -719,50 +740,42 @@ to move-hurdle-one-two
   if hurdletick mod 10 = 3 [
     ask hurdles with [hurdleNumber = 0] [
       set xcor 23
-      check-player-colission
     ]
 
     ask hurdles with [hurdleNumber = 1] [
       set xcor 46
-      check-player-colission
     ]
   ]
   if hurdletick mod 10 = 4 [
     ask hurdles with [hurdleNumber = 0] [
       set xcor 24
-      check-player-colission
     ]
 
   ]
   if hurdletick mod 10 = 5 [
     ask hurdles with [hurdleNumber = 0] [
       set xcor 23
-      check-player-colission
     ]
 
   ]
   if hurdletick mod 10 = 6 [
     ask hurdles with [hurdleNumber = 0] [
       set xcor 22
-      check-player-colission
     ]
 
     ask hurdles with [hurdleNumber = 1] [
       set xcor 47
-      check-player-colission
     ]
   ]
   if hurdletick mod 10 = 7 [
     ask hurdles with [hurdleNumber = 0] [
       set xcor 21
-      check-player-colission
     ]
 
   ]
   if hurdletick mod 10 = 8 [
     ask hurdles with [hurdleNumber = 0] [
       set xcor 20
-      check-player-colission
     ]
 
   ]
@@ -770,13 +783,14 @@ to move-hurdle-one-two
   if hurdletick mod 10 = 9 [
     ask hurdles with [hurdleNumber = 0] [
       set xcor 20
-      check-player-colission
     ]
 
     ask hurdles with [hurdleNumber = 1] [
       set xcor 46
-      check-player-colission
     ]
+  ]
+  ask hurdles[
+    check-player-colission
   ]
 
 end
@@ -929,10 +943,12 @@ end
 
 to fall-down
   ask players [
-    set ycor 0
+    while [ycor > 0] [
+      set ycor ycor - 1
       check-hurdle-colission
       check-coin-colission
       check-fire-colission
+    ]
   ]
   set hasJumped true
 
@@ -1116,7 +1132,7 @@ learningRate
 learningRate
 0.01
 1
-0.53
+0.7
 0.01
 1
 NIL
@@ -1131,7 +1147,7 @@ discountFactor
 discountFactor
 0
 0.99
-0.42
+0.21
 0.01
 1
 NIL
@@ -1174,7 +1190,7 @@ Iterations
 Iterations
 0
 5000
-3100
+2000
 100
 1
 NIL
@@ -1263,10 +1279,21 @@ INPUTBOX
 1024
 426
 coin-reward
-10
+25
 1
 0
 Number
+
+SWITCH
+706
+763
+840
+796
+level-variation
+level-variation
+1
+1
+-1000
 
 @#$#@#$#@
 ## What is being shown?
@@ -1672,7 +1699,7 @@ Polygon -7500403 true true 270 75 225 30 30 225 75 270
 Polygon -7500403 true true 30 75 75 30 270 225 225 270
 
 @#$#@#$#@
-NetLogo 5.3.1
+NetLogo 6.0-M6
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@
