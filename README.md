@@ -1,6 +1,6 @@
 # Organic Computing Project
 
-# Recreation of the Game "Hurdler"
+## Recreation of the Game "Hurdler"
 
 This Project includes the follwing:
   - Building the basic game with controls, visuals, and objectives
